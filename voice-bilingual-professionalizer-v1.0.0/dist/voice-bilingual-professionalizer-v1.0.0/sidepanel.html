@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Bilingual Professionalizer - Side Panel</title>
+  <link rel="stylesheet" href="popup.css">
+  <style>
+    body {
+      width: 100%;
+      height: 100vh;
+      max-height: none;
+      min-height: 100vh;
+    }
+    .app-container {
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-icon">🎙</span>
+        <span class="brand-title">Voice Side Panel</span>
+      </div>
+      <div class="header-actions">
+        <button id="btn-settings" class="icon-btn" title="Settings" aria-label="Open Settings">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Running API Key Indicator Bar -->
+    <div id="sidepanel-api-banner" class="api-status-banner">
+      <div class="api-status-left">
+        <span class="live-dot"></span>
+        <span class="api-text">Running API Key: <strong id="sidepanel-api-name">OpenAI</strong></span>
+      </div>
+    </div>
+
+    <main class="content-body">
+      <!-- 1. RECORDING STAGE -->
+      <section id="stage-voice" class="stage-section active">
+        <div class="mic-cluster">
+          <div id="mic-pulse-ring" class="pulse-ring"></div>
+          <button id="btn-mic" class="mic-button" aria-label="Toggle Recording">
+            <svg id="mic-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+        </div>
+
+        <div class="status-zone">
+          <span id="recording-timer" class="recording-timer tabular-nums">00:00</span>
+        </div>
+
+        <div class="lang-selector-strip">
+          <label class="lang-label">
+            <input type="radio" name="lang" value="bn-BD" id="lang-bn" checked>
+            <span>🇧🇩 বাংলা</span>
+          </label>
+          <label class="lang-label">
+            <input type="radio" name="lang" value="en-US" id="lang-en">
+            <span>🇬🇧 English</span>
+          </label>
+        </div>
+
+        <div class="transcript-box">
+          <div class="transcript-box-header">
+            <span class="transcript-box-title">Original Voice Input</span>
+            <button id="btn-copy-header" class="mini-copy-btn" title="Copy original voice input" disabled>
+              <span id="copy-header-text">📋 Copy</span>
+            </button>
+          </div>
+          <div id="transcript-preview" class="transcript-preview empty">
+            <span class="preview-placeholder"></span>
+          </div>
+        </div>
+
+        <div class="voice-controls-stacked">
+          <div class="voice-controls-row">
+            <button id="btn-stop" class="btn btn-stop" disabled title="Stop voice recording">
+              <span>■ Stop</span>
+            </button>
+            <button id="btn-copy-original" class="btn btn-copy" disabled title="Copy voice input directly">
+              <span>📋 Copy Voice Input</span>
+            </button>
+          </div>
+          <div class="voice-controls-row">
+            <button id="btn-refine" class="btn btn-primary" disabled title="Refine into professional versions">
+              <span>✨ Refine</span>
+            </button>
+            <button id="btn-cancel" class="btn btn-secondary" title="Cancel recording">
+              <span>✕ Cancel</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. LOADING STAGE -->
+      <section id="stage-loading" class="stage-section">
+        <div class="spinner-container">
+          <div class="spinner"></div>
+          <p id="loading-message" class="loading-text">Polishing into professional Bangla & English...</p>
+        </div>
+      </section>
+
+      <!-- 3. RESULT STAGE -->
+      <section id="stage-result" class="stage-section">
+        <div class="result-card bangla-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="flag">🇧🇩</span>
+              <span class="card-name">Bangla Professional</span>
+            </div>
+            <button id="btn-copy-bn" class="copy-btn" title="Copy Bangla">
+              <span class="copy-icon">📋</span>
+              <span class="copy-text">Copy</span>
+            </button>
+          </div>
+          <div class="card-content">
+            <textarea id="output-bn" class="result-textarea bn-font" spellcheck="false" rows="4"></textarea>
+          </div>
+        </div>
+
+        <div class="result-card english-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="flag">🇬🇧</span>
+              <span class="card-name">English Professional</span>
+            </div>
+            <button id="btn-copy-en" class="copy-btn" title="Copy English">
+              <span class="copy-icon">📋</span>
+              <span class="copy-text">Copy</span>
+            </button>
+          </div>
+          <div class="card-content">
+            <textarea id="output-en" class="result-textarea en-font" spellcheck="false" rows="4"></textarea>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <button id="btn-record-again" class="btn btn-primary">
+            <span>↻ Record Again</span>
+          </button>
+          <button id="btn-copy-both" class="btn btn-secondary">
+            <span>Copy Both</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 4. ERROR STAGE -->
+      <section id="stage-error" class="stage-section">
+        <div class="error-banner">
+          <div class="error-icon">⚠️</div>
+          <div class="error-content">
+            <h4 id="error-title" class="error-title">Notice</h4>
+            <p id="error-desc" class="error-desc">An error occurred.</p>
+          </div>
+        </div>
+        <div class="error-actions">
+          <button id="btn-error-retry" class="btn btn-primary">Try Again</button>
+          <button id="btn-error-settings" class="btn btn-secondary">Open Settings</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span class="developer-credit">Developed by <strong>Akash</strong></span>
+      <span class="shortcut-tip">Shortcut: <kbd>Ctrl+Shift+X</kbd></span>
+    </footer>
+  </div>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

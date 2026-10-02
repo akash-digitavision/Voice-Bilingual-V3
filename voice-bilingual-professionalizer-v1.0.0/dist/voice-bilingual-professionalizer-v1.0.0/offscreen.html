@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Voice Professionalizer — Whisper Recorder</title></head>
+<body>
+  <!-- Hidden persistent page: owns mic capture + local Whisper inference so a
+       recording survives popup focus loss / closing (MV3 popups are destroyed on
+       blur, which previously killed the AudioContext mid-recording). -->
+  <script type="module" src="offscreen-recorder.js"></script>
+</body>
+</html>

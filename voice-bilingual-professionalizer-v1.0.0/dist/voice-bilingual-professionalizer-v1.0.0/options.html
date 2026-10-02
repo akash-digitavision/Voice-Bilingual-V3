@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — Voice Bilingual Professionalizer</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="settings-layout">
+    <!-- Header -->
+    <header class="settings-header">
+      <div class="brand-bar">
+        <span class="brand-icon">🎙</span>
+        <h1 class="brand-title">Voice Bilingual Professionalizer</h1>
+      </div>
+      <p class="brand-subtitle">Configure AI credentials, speech recognition preferences, and keyboard shortcuts.</p>
+      
+      <!-- Active Running Platform Status Banner -->
+      <div class="active-running-banner no-active" id="options-active-banner">
+        <div class="banner-left">
+          <span class="live-pulse-dot dot-inactive" id="active-banner-dot"></span>
+          <span id="active-banner-text">Running API Key: <strong id="active-banner-name">None</strong> <span id="active-banner-model" class="banner-sub"></span></span>
+        </div>
+        <span class="active-badge-pill pill-inactive" id="active-banner-pill">NO RUNNING ENGINE</span>
+      </div>
+    </header>
+
+    <!-- Main Settings Form -->
+    <main class="settings-body">
+      <!-- Section 1: AI Provider & Credentials -->
+      <section class="settings-card">
+        <div class="card-title-row">
+          <h2 class="card-heading">AI Provider Configuration</h2>
+          <span class="security-badge">🔒 Secure Local Storage</span>
+        </div>
+        <p class="section-desc">Select a platform panel below to configure credentials. Active status is strictly based on having a configured API key.</p>
+
+        <!-- Provider Tabs (Click to View/Edit panel; does not switch active status without saving key) -->
+        <div class="provider-tabs-bar" role="tablist">
+          <button type="button" class="tab-button" id="tab-btn-gemini" data-tab="gemini">
+            <div class="tab-card-content">
+              <div class="tab-title-row">
+                <strong class="tab-title" style="color: #38bdf8;">Google API</strong>
+                <span class="tab-status-pill status-empty" id="status-pill-gemini">Not Configured</span>
+              </div>
+              <small class="tab-sub">Gemini 3.8 Flash</small>
+            </div>
+          </button>
+
+          <button type="button" class="tab-button" id="tab-btn-openai" data-tab="openai">
+            <div class="tab-card-content">
+              <div class="tab-title-row">
+                <strong class="tab-title" style="color: #34d399;">OpenAI</strong>
+                <span class="tab-status-pill status-empty" id="status-pill-openai">Not Configured</span>
+              </div>
+              <small class="tab-sub">GPT-4o / GPT-4o-mini</small>
+            </div>
+          </button>
+
+          <button type="button" class="tab-button" id="tab-btn-custom" data-tab="custom">
+            <div class="tab-card-content">
+              <div class="tab-title-row">
+                <strong class="tab-title" style="color: #c084fc;">Custom API</strong>
+                <span class="tab-status-pill status-empty" id="status-pill-custom">Not Configured</span>
+              </div>
+              <small class="tab-sub">Ollama, Groq, Proxy</small>
+            </div>
+          </button>
+        </div>
+
+        <!-- Google Gemini Fields -->
+        <div id="fields-gemini" class="provider-fields">
+          <div class="panel-header-badge badge-empty" id="panel-badge-gemini">
+            <span>● Google Gemini: Not Configured</span>
+          </div>
+
+          <div class="form-group">
+            <label for="gemini-key">Gemini API Key</label>
+            <div class="input-with-button">
+              <input type="password" id="gemini-key" placeholder="AIza..." autocomplete="off">
+              <button type="button" id="btn-toggle-gemini" class="btn-toggle">Show</button>
+            </div>
+            <small class="field-hint">Obtain key free from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a>.</small>
+          </div>
+          <div class="form-group">
+            <label for="gemini-model">Model</label>
+            <select id="gemini-model">
+              <option value="gemini-3.8-flash">gemini-3.8-flash (Latest & Recommended - Fast Bilingual)</option>
+              <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (Cost-Efficient Flash Lite)</option>
+              <option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview (Complex Nuance & Pro Reasoning)</option>
+              <option value="gemini-flash-latest">gemini-flash-latest (Always Latest Flash)</option>
+            </select>
+          </div>
+          <div class="btn-panel-actions">
+            <button type="button" id="btn-save-gemini" class="btn btn-primary">Save & Activate Google API</button>
+            <button type="button" id="btn-clear-gemini" class="btn btn-danger-outline" style="display:none;">Clear Key</button>
+          </div>
+        </div>
+
+        <!-- OpenAI Fields -->
+        <div id="fields-openai" class="provider-fields" style="display: none;">
+          <div class="panel-header-badge badge-empty" id="panel-badge-openai">
+            <span>● OpenAI: Not Configured</span>
+          </div>
+
+          <div class="form-group">
+            <label for="openai-key">OpenAI API Key</label>
+            <div class="input-with-button">
+              <input type="password" id="openai-key" placeholder="sk-..." autocomplete="off">
+              <button type="button" id="btn-toggle-openai" class="btn-toggle">Show</button>
+            </div>
+            <small class="field-hint">Obtain from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com</a>. Note: ChatGPT web login is separate from API keys.</small>
+          </div>
+          <div class="form-group">
+            <label for="openai-model">Model</label>
+            <select id="openai-model">
+              <option value="gpt-4o-mini">gpt-4o-mini (Fast & Recommended)</option>
+              <option value="gpt-4o">gpt-4o (Flagship Multilingual)</option>
+              <option value="o3-mini">o3-mini (High-Accuracy Reasoning)</option>
+              <option value="chatgpt-4o-latest">chatgpt-4o-latest</option>
+            </select>
+          </div>
+          <div class="btn-panel-actions">
+            <button type="button" id="btn-save-openai" class="btn btn-primary">Save & Activate OpenAI</button>
+            <button type="button" id="btn-clear-openai" class="btn btn-danger-outline" style="display:none;">Clear Key</button>
+          </div>
+        </div>
+
+        <!-- Custom Fields -->
+        <div id="fields-custom" class="provider-fields" style="display: none;">
+          <div class="panel-header-badge badge-empty" id="panel-badge-custom">
+            <span>● Custom API: Not Configured</span>
+          </div>
+
+          <div class="form-group">
+            <label for="custom-endpoint">Endpoint URL (OpenAI-compatible)</label>
+            <input type="url" id="custom-endpoint" placeholder="http://localhost:11434/v1/chat/completions">
+          </div>
+          <div class="form-group">
+            <label for="custom-key">API Key (Optional)</label>
+            <input type="password" id="custom-key" placeholder="Bearer token if required">
+          </div>
+          <div class="form-group">
+            <label for="custom-model">Model Name</label>
+            <input type="text" id="custom-model" placeholder="e.g. llama3:latest">
+          </div>
+          <div class="btn-panel-actions">
+            <button type="button" id="btn-save-custom" class="btn btn-primary">Save & Activate Custom API</button>
+            <button type="button" id="btn-clear-custom" class="btn btn-danger-outline" style="display:none;">Clear Key</button>
+          </div>
+        </div>
+
+        <!-- Test Connection Row -->
+        <div class="test-row" style="margin-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 16px;">
+          <button type="button" id="btn-test-connection" class="btn btn-secondary">Test Connection (Current Panel)</button>
+          <span id="test-status" class="test-status"></span>
+        </div>
+      </section>
+
+      <!-- Section 2: Speech & Voice Preferences -->
+      <section class="settings-card">
+        <div class="card-title-row">
+          <h2 class="card-heading">Speech & Voice Recognition</h2>
+          <span class="security-badge" id="stt-security-pill">🛡️ Privacy-First On-Device STT</span>
+        </div>
+        <p class="section-desc">Choose between local on-device Multilingual Whisper (private, no audio sent to cloud) or existing Cloud/API fallback.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="pref-speech-engine">Voice Recognition Mode</label>
+            <select id="pref-speech-engine">
+              <option value="auto">Auto — Browser Speech if available, else Local Whisper (recommended)</option>
+              <option value="cloud">Browser Speech — instant live words (Chrome)</option>
+              <option value="local">Local Whisper — on-device, private (Shift / offline)</option>
+            </select>
+            <p style="font-size: 10.5px; color: #94a3b8; margin: 6px 0 0 0; line-height: 1.5;">
+              <strong>Auto</strong> uses Browser Speech first; if this browser has no speech service (e.g. Shift), it is
+              detected once and Auto switches to Local Whisper automatically — no repeated failed attempts.
+              A <strong>Voice API</strong> provider (external transcription service) is planned as a fourth mode and will
+              be enabled after the on-device Whisper benchmark on your machine, per the fallback order
+              Browser Speech → Local Whisper → Voice API.
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label for="pref-local-model">Local Whisper Model</label>
+            <select id="pref-local-model">
+              <option value="onnx-community/whisper-base">whisper-base (~82 MB — Fast & Multilingual BN/EN/Banglish)</option>
+              <option value="onnx-community/whisper-small">whisper-small (~200 MB — High Accuracy Complex Speech)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid" style="margin-top: 10px;">
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label for="pref-acceleration" style="margin-bottom: 0;">Hardware Acceleration</label>
+              <span id="detected-hw-pill" class="security-badge" style="font-size: 10px; background: rgba(56, 189, 248, 0.12); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">
+                Hardware: <strong id="detected-hw-name">Detecting...</strong>
+              </span>
+            </div>
+            <select id="pref-acceleration">
+              <option value="auto">Auto-Detect (WebGPU Preferred, CPU Fallback)</option>
+              <option value="webgpu">WebGPU Only (Fastest GPU)</option>
+              <option value="cpu">CPU / WASM Only (Universal Compatibility)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="pref-language">Default Input Language</label>
+            <select id="pref-language">
+              <option value="auto">Auto Detect (Bangla / English / Banglish)</option>
+              <option value="bn-BD">Bangla (বাংলাদেশ - bn-BD)</option>
+              <option value="en-US">English (United States - en-US)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 10px;">
+          <label class="checkbox-label">
+            <input type="checkbox" id="pref-autostart">
+            <span>Automatically start listening when extension opens</span>
+          </label>
+        </div>
+
+        <!-- Automatic Whisper Downloader & Cache Manager -->
+        <div style="margin-top: 14px; padding: 12px 14px; background: rgba(8, 47, 73, 0.45); border: 1px solid rgba(14, 165, 233, 0.4); border-radius: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div>
+              <strong style="color: #38bdf8; font-size: 12px; display: block;">⚡ Whisper Local Setup & Auto-Downloader:</strong>
+              <span style="font-size: 11px; color: #94a3b8;">Force-download and pre-cache model weights permanently into your browser.</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <button type="button" id="btn-verify-whisper" class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px; font-weight: 600; border-color: rgba(52, 211, 153, 0.4); color: #34d399;">
+                🩺 Verify Local Whisper Runtime
+              </button>
+              <button type="button" id="btn-run-mic-test" class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px; font-weight: 600; border-color: rgba(250, 204, 21, 0.4); color: #facc15;">
+                🎤 Test Microphone (audio chain)
+              </button>
+              <button type="button" id="btn-copy-whisper-report" class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px; font-weight: 600; border-color: rgba(148, 163, 184, 0.4); color: #94a3b8;">
+                📋 Copy Diagnostics
+              </button>
+              <button type="button" id="btn-force-download-whisper" class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px; font-weight: 600; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+                ⬇ Download & Pre-Cache Whisper Now
+              </button>
+            </div>
+          </div>
+          <div id="mic-test-status" style="font-size: 11px; color: #cbd5e1; display: none; padding-top: 6px; margin-top: 8px; border-top: 1px dashed rgba(250, 204, 21, 0.25);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span id="mic-test-spinner" class="live-pulse-dot" style="background: #facc15;"></span>
+              <span id="mic-test-msg">Ready to test the microphone audio chain.</span>
+            </div>
+            <pre id="mic-test-output" style="display: none; margin: 8px 0 0 0; padding: 8px 10px; max-height: 220px; overflow: auto; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(250, 204, 21, 0.3); border-radius: 6px; color: #fde68a; font-size: 10.5px; line-height: 1.45; white-space: pre-wrap; word-break: break-word;"></pre>
+          </div>
+          <div id="whisper-download-status" style="font-size: 11px; color: #cbd5e1; display: none; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.1);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span id="whisper-download-spinner" class="live-pulse-dot" style="background: #38bdf8;"></span>
+              <span id="whisper-download-msg">Ready to download.</span>
+            </div>
+            <div style="margin-top: 6px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;">
+              <div id="whisper-download-bar" style="height: 100%; width: 0%; background: #0284c7; transition: width 0.2s;"></div>
+            </div>
+            <!-- Actual underlying exception, never swallowed -->
+            <pre id="whisper-error-detail" style="display: none; margin: 8px 0 0 0; padding: 8px 10px; max-height: 150px; overflow: auto; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(248, 113, 113, 0.35); border-radius: 6px; color: #fca5a5; font-size: 10.5px; line-height: 1.45; white-space: pre-wrap; word-break: break-word;"></pre>
+          </div>
+        </div>
+
+        <!-- Hardware & Whisper Compatibility Guide -->
+        <div style="margin-top: 14px; padding: 10px 12px; background: rgba(16, 28, 54, 0.6); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; font-size: 11px; line-height: 1.5; color: #94a3b8;">
+          <strong style="color: #38bdf8; display: block; margin-bottom: 4px;">💡 Device Compatibility & Whisper Setup:</strong>
+          <ul style="margin: 0; padding-left: 16px;">
+            <li><strong>Instant Mode (Cloud / Web Speech API):</strong> Requires 0 MB download, works immediately on every device without special GPU requirements.</li>
+            <li><strong>Local Whisper Mode:</strong> Runs on-device. First use downloads ~82 MB ONNX weights and stores them permanently in your browser cache.</li>
+            <li><strong>To enable WebGPU in Chrome:</strong> Ensure Chrome version 113+ is used, hardware acceleration is enabled in <code>chrome://settings/system</code>, and flags in <code>chrome://flags/#enable-unsafe-webgpu</code> can be toggled if needed.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Voice Input API (separate namespace from Refine) -->
+      <section class="settings-card">
+        <div class="card-title-row">
+          <h2 class="card-heading">Voice Input</h2>
+          <span class="security-badge">🌐 External transcription — audio leaves the device in this mode</span>
+        </div>
+        <p class="section-desc">For browsers without a speech service (e.g. Shift). Records your voice, sends the recording to the selected provider, and returns text. Keys here are separate from your Refine API keys.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="pref-voice-engine">Recognition Engine</label>
+            <select id="pref-voice-engine">
+              <option value="browser">Browser Speech (default — no API key)</option>
+              <option value="openai">OpenAI — /v1/audio/transcriptions</option>
+              <option value="google">Google Cloud Speech-to-Text</option>
+              <option value="deepgram">Deepgram</option>
+              <option value="assemblyai">AssemblyAI</option>
+              <option value="custom">Custom API</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pref-voice-language">Voice Input Language</label>
+            <select id="pref-voice-language">
+              <option value="auto">Auto</option>
+              <option value="bn">Bangla (bn)</option>
+              <option value="en">English (en)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid" style="margin-top: 10px;">
+          <div class="form-group" id="voice-group-openai">
+            <label for="voice-openai-key">OpenAI API Key</label>
+            <input type="password" id="voice-openai-key" placeholder="sk-..." autocomplete="off">
+            <label for="voice-openai-model" style="margin-top:6px;">Model</label>
+            <input type="text" id="voice-openai-model" placeholder="whisper-1" autocomplete="off">
+          </div>
+          <div class="form-group" id="voice-group-google">
+            <label for="voice-google-key">Google Cloud API Key</label>
+            <input type="password" id="voice-google-key" placeholder="AIza..." autocomplete="off">
+          </div>
+          <div class="form-group" id="voice-group-deepgram">
+            <label for="voice-deepgram-key">Deepgram API Key</label>
+            <input type="password" id="voice-deepgram-key" autocomplete="off">
+            <label for="voice-deepgram-model" style="margin-top:6px;">Model</label>
+            <input type="text" id="voice-deepgram-model" placeholder="nova-2" autocomplete="off">
+          </div>
+          <div class="form-group" id="voice-group-assemblyai">
+            <label for="voice-assemblyai-key">AssemblyAI API Key</label>
+            <input type="password" id="voice-assemblyai-key" autocomplete="off">
+          </div>
+        </div>
+
+        <div id="voice-group-custom" style="display:none;">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="voice-custom-endpoint">Endpoint</label>
+              <input type="text" id="voice-custom-endpoint" placeholder="https://example.com/v1/transcribe" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="voice-custom-auth-type">Authorization</label>
+              <select id="voice-custom-auth-type">
+                <option value="none">None</option>
+                <option value="bearer" selected>Bearer Token</option>
+                <option value="apiKeyHeader">API Key Header</option>
+                <option value="customHeader">Custom Header</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid" style="margin-top: 10px;">
+            <div class="form-group">
+              <label for="voice-custom-key">API Key</label>
+              <input type="password" id="voice-custom-key" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="voice-custom-auth-header">Auth Header Name</label>
+              <input type="text" id="voice-custom-auth-header" placeholder="x-api-key" autocomplete="off">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-top: 10px;">
+            <div class="form-group">
+              <label for="voice-custom-audio-field">Audio Field Name</label>
+              <input type="text" id="voice-custom-audio-field" placeholder="file" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="voice-custom-response-path">Response Text Path</label>
+              <input type="text" id="voice-custom-response-path" placeholder="text" autocomplete="off">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-top: 10px;">
+            <div class="form-group">
+              <label for="voice-custom-model">Model (optional)</label>
+              <input type="text" id="voice-custom-model" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="voice-custom-model-field">Model Field (optional)</label>
+              <input type="text" id="voice-custom-model-field" placeholder="model" autocomplete="off">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-top: 10px;">
+            <div class="form-group">
+              <label for="voice-custom-language-field">Language Field (optional)</label>
+              <input type="text" id="voice-custom-language-field" placeholder="language" autocomplete="off">
+            </div>
+          </div>
+        </div>
+
+        <div class="test-row" style="margin-top: 14px;">
+          <button type="button" id="btn-voice-test" class="btn btn-secondary">Test Voice Connection</button>
+          <span id="voice-test-status" class="test-status"></span>
+        </div>
+      </section>
+
+      <!-- Section 3: Output Tone & Style -->
+      <section class="settings-card">
+        <h2 class="card-heading">Professional Output Tuning</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="pref-tone">Refinement Tone</label>
+            <select id="pref-tone">
+              <option value="professional">Professional & Polite (Balanced Corporate)</option>
+              <option value="executive">Executive & Formal (Concise & Direct)</option>
+              <option value="friendly">Helpful & Warm (Client Relations)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pref-conciseness">Length & Detail</label>
+            <select id="pref-conciseness">
+              <option value="balanced">Balanced (Recommended)</option>
+              <option value="concise">Concise & Punchy</option>
+              <option value="detailed">Comprehensive & Expressive</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Keyboard Shortcut Guide -->
+      <section class="settings-card">
+        <h2 class="card-heading">Keyboard Shortcut</h2>
+        <p class="section-desc">Activate voice recording instantly from any active tab.</p>
+        <div class="shortcut-box">
+          <div class="shortcut-display">
+            <span>Primary Shortcut:</span>
+            <kbd>Ctrl + Shift + X</kbd> <span class="dim">(or <kbd>⌘ + Shift + X</kbd> on Mac)</span>
+          </div>
+          <p class="shortcut-instructions">
+            To change or customize this keybinding in Chrome:
+            <br>
+            1. Open a new tab and navigate to: <code class="code-url">chrome://extensions/shortcuts</code>
+            <br>
+            2. Locate <strong>Voice Bilingual Professionalizer</strong>.
+            <br>
+            3. Click the pencil icon and press your desired shortcut key combination.
+          </p>
+          <p class="shortcut-instructions" style="margin-top: 8px;">
+            <strong>Shift Browser users:</strong> Shift may reserve <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> for its own
+            sidebar. If the shortcut does nothing in Shift, open Shift's own keyboard-shortcut settings and either free
+            <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> or assign this extension a different combination via
+            <code class="code-url">chrome://extensions/shortcuts</code>. In Google Chrome the default binding works as-is.
+          </p>
+        </div>
+
+        <!-- Recommended browser setup for Local Speech AI (GPU / WebGPU) -->
+        <div class="shortcut-box" style="margin-top: 12px;">
+          <div class="shortcut-display">
+            <span>Local Speech AI — Recommended Browser Setup:</span>
+          </div>
+          <p class="shortcut-instructions">
+            <strong>1. Enable Graphics Acceleration</strong> — for better Local Speech AI and GPU-accelerated processing,
+            make sure browser graphics acceleration is enabled:
+            <br>
+            1. Open a new tab and navigate to: <code class="code-url">chrome://settings/system</code>
+            <br>
+            2. Enable <strong>"Use graphics acceleration when available"</strong>.
+            <br>
+            3. Relaunch the browser for the change to take effect.
+          </p>
+          <p class="shortcut-instructions" style="margin-top: 8px;">
+            <strong>2. Verify WebGPU</strong> — Local Speech AI uses WebGPU for hardware-accelerated Whisper inference when
+            supported (the extension detects this automatically; no experimental flags are required):
+            <br>
+            1. Open a new tab and navigate to: <code class="code-url">chrome://gpu</code>
+            <br>
+            2. Check <strong>Graphics Feature Status</strong> — "WebGPU" should read
+            <strong>Hardware accelerated</strong> ("Software only" still works via the automatic CPU/WASM fallback).
+            <br>
+            3. Keep Hardware Acceleration on <strong>Auto-Detect</strong> in this page unless diagnostics indicate otherwise.
+          </p>
+          <p class="shortcut-instructions" style="margin-top: 8px;">
+            <strong>3. Enable WebGPU support via flags (only if step 2 shows WebGPU unavailable)</strong>:
+            <br>
+            1. Open a new tab and navigate to: <code class="code-url">chrome://flags/</code>
+            <br>
+            2. Search for <strong>WebGPU</strong> and set <strong>#enable-unsafe-webgpu</strong> to <strong>Enabled</strong>.
+            <br>
+            3. Relaunch the browser, then re-check <code class="code-url">chrome://gpu</code>.
+            <br>
+            Note: only do this when WebGPU is genuinely missing in your browser (some Chromium forks ship with it
+            disabled) — the extension already uses feature detection, so no flag is needed in standard Chrome.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 5: Privacy & Architecture Guarantee -->
+      <section class="settings-card privacy-card">
+        <h2 class="card-heading">Privacy & Data Handling</h2>
+        <ul class="privacy-list">
+          <li><strong>Zero Session Scraping:</strong> We never inspect, collect, or scrape ChatGPT web cookies or account passwords.</li>
+          <li><strong>Ephemeral Audio:</strong> Microphone audio is converted to text in-memory and immediately released. Zero audio is stored.</li>
+          <li><strong>Local Storage:</strong> Your API keys are stored in Chrome's sandboxed local storage on your machine.</li>
+        </ul>
+      </section>
+
+      <!-- Save Bar -->
+      <div class="save-bar">
+        <button type="button" id="btn-save-settings" class="btn btn-primary">Save Settings</button>
+        <span id="save-status" class="save-status"></span>
+      </div>
+    </main>
+  </div>
+
+  <!--
+    NOTE: vendor/transformers.js is an ES module bundle. Loading it with a classic
+    <script> tag throws "Unexpected token 'export'" and never defines
+    window.transformers. The Local STT engine loads it via dynamic
+    import(chrome.runtime.getURL('vendor/transformers.js')) instead.
+  -->
+  <script type="module" src="options.js"></script>
+</body>
+</html>

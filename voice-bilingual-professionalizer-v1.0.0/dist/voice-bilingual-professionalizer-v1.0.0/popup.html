@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Bilingual Professionalizer</title>
+  <link rel="stylesheet" href="popup.css">
+  <script>
+    // Immediate redirect to independent/free window if previously chosen
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isDetachedWindow = urlParams.get('mode') === 'detached';
+      if (!isDetachedWindow && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get(['windowMode'], (res) => {
+          if (res && res.windowMode === 'detached') {
+            chrome.runtime.sendMessage({ type: 'OPEN_DETACHED_WINDOW' });
+            window.close();
+          }
+        });
+      }
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <div class="app-container" id="app-container">
+    <!-- Header — § FINAL TOP ROW: Voice Recorder LEFT · "Voice Assistant" CENTER (brown) ·
+         Dock/Pin + Settings RIGHT. All three keys share the same recessed material. -->
+    <header class="app-header">
+      <!-- LEFT: functional Voice Recorder key -->
+      <div class="mic-icon-wrapper">
+        <div id="mic-pulse-ring" class="pulse-ring-compact"></div>
+        <button id="btn-mic" class="mic-btn-compact" aria-label="Toggle Recording" title="Click to speak/stop">
+          <svg id="mic-svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+      </div>
+      <!-- CENTER: title label — brown, not a control -->
+      <span class="header-title">Voice Assistant</span>
+      <!-- RIGHT: Dock/Pin + Settings keys -->
+      <div class="header-actions">
+        <button id="btn-popout" class="popout-btn" title="Toggle free movable window" aria-label="Toggle free movable window">
+          <span id="popout-label">⤢</span>
+        </button>
+        <button id="btn-settings" class="icon-btn" title="Settings" aria-label="Open Settings">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Body -->
+    <main class="content-body">
+      <!-- 1. RECORDING / VOICE STAGE -->
+      <section id="stage-voice" class="stage-section active">
+        <!-- Input Text Field: placed ABOVE the Voice control row (§ layout rearrangement) -->
+        <!-- Live Interim Transcript Preview (Expanded by Default with Collapse option) -->
+        <div class="transcript-box is-expanded" id="transcript-box">
+          <div class="transcript-box-header">
+            <div class="transcript-title-group">
+              <span id="voice-stack-badge" class="voice-stack-pill" title="Currently active Voice Recognition Stack">
+                <strong id="voice-stack-name">Web Speech (Cloud)</strong>
+              </span>
+            </div>
+            <div class="transcript-header-actions">
+              <button id="btn-copy-header" class="mini-action-btn" title="Copy voice input" aria-label="Copy voice input" disabled>
+                <span id="copy-header-text">📋</span>
+              </button>
+              <button id="btn-expand-transcript" class="mini-action-btn expand-btn" title="Collapse text area" aria-label="Collapse transcript">
+                <svg id="expand-icon-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>
+              </button>
+            </div>
+          </div>
+          <!-- § EDITABLE INPUT: the recognized transcript is now a manually editable
+               field (same .transcript-preview styling/geometry). Edits sync into the
+               app state, so Copy/Refine always use the CURRENT field content. -->
+          <textarea id="transcript-preview" class="transcript-preview empty" spellcheck="false" aria-label="Voice input transcript (editable)"></textarea>
+        </div>
+
+        <!-- § CLEANUP: the Bangla/English/Timer row was removed per instruction —
+             language defaults to Bangla (the prior checked default) and the timer
+             is no longer displayed. The row container is gone entirely. -->
+        <!-- Control Actions Below Text Field: Two Columns -->
+        <!-- Left column: Copy and Refine | Right column: Stop and Cancel -->
+        <div class="voice-controls-grid">
+          <!-- Left Column: Copy and Refine -->
+          <div class="voice-controls-col">
+            <button id="btn-copy-original" class="btn btn-copy" disabled title="Copy voice input directly" aria-label="Copy voice input">
+              <span>Copy</span>
+            </button>
+            <button id="btn-refine" class="btn btn-primary" disabled title="Refine into professional versions">
+              <span>Refine</span>
+            </button>
+          </div>
+
+          <!-- Right Column: Stop and Close -->
+          <div class="voice-controls-col">
+            <button id="btn-stop" class="btn btn-stop" disabled title="Stop voice recording">
+              <span>Stop</span>
+            </button>
+            <button id="btn-cancel" class="btn btn-secondary" title="Close recording" aria-label="Close">
+              <span>Close</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. LOADING / GENERATING STAGE -->
+      <section id="stage-loading" class="stage-section">
+        <div class="spinner-container">
+          <div class="spinner"></div>
+          <p id="loading-message" class="loading-text">Polishing into professional Bangla & English...</p>
+        </div>
+      </section>
+
+      <!-- 3. RESULT STAGE -->
+      <section id="stage-result" class="stage-section">
+        <!-- Bangla Result Card -->
+        <div class="result-card bangla-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="flag">🇧🇩</span>
+              <span class="card-name">Bangla</span>
+            </div>
+            <button id="btn-copy-bn" class="copy-btn" title="Copy Bangla" aria-label="Copy Bangla">
+              <span class="copy-text">📋</span>
+            </button>
+            <!-- § RESULT EXPAND: independent expand/collapse for the Bangla output -->
+            <button id="btn-expand-bn" class="mini-action-btn expand-btn" title="Expand Bangla text" aria-label="Expand Bangla text">
+              <svg id="expand-bn-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>
+            </button>
+          </div>
+          <div class="card-content">
+            <textarea id="output-bn" class="result-textarea bn-font" spellcheck="false" rows="2"></textarea>
+          </div>
+        </div>
+
+        <!-- English Result Card -->
+        <div class="result-card english-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="flag">🇬🇧</span>
+              <span class="card-name">English</span>
+            </div>
+            <button id="btn-copy-en" class="copy-btn" title="Copy English" aria-label="Copy English">
+              <span class="copy-text">📋</span>
+            </button>
+            <!-- § RESULT EXPAND: independent expand/collapse for the English output -->
+            <button id="btn-expand-en" class="mini-action-btn expand-btn" title="Expand English text" aria-label="Expand English text">
+              <svg id="expand-en-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>
+            </button>
+          </div>
+          <div class="card-content">
+            <textarea id="output-en" class="result-textarea en-font" spellcheck="false" rows="2"></textarea>
+          </div>
+        </div>
+
+        <!-- Bottom Action Row -->
+        <div class="result-actions">
+          <button id="btn-record-again" class="btn btn-primary">
+            <span>↻ Record Again</span>
+          </button>
+          <button id="btn-copy-both" class="btn btn-secondary">
+            <span>Copy Both</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 4. ERROR STAGE -->
+      <section id="stage-error" class="stage-section">
+        <div class="error-banner">
+          <div class="error-icon">⚠️</div>
+          <div class="error-content">
+            <h4 id="error-title" class="error-title">Notice</h4>
+            <p id="error-desc" class="error-desc">An error occurred.</p>
+          </div>
+        </div>
+        <div class="error-actions">
+          <button id="btn-switch-cloud-stt" class="btn btn-primary" style="display: none; background: #0284c7;">⚡ Switch to Instant Cloud Voice</button>
+          <button id="btn-switch-local-stt" class="btn btn-primary" style="display: none; background: #059669;">🔒 Switch to Local (Whisper) — no speech service needed</button>
+          <button id="btn-error-retry" class="btn btn-secondary">Try Again</button>
+          <button id="btn-error-settings" class="btn btn-secondary">Settings</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- § layout rearrangement: Running API row moved to the lower section (§8/§9) -->
+    <div id="popup-api-banner" class="api-status-banner">
+      <div class="api-status-left">
+        <span class="live-dot" id="popup-live-dot"></span>
+        <span class="api-text">Running API: <strong id="popup-api-name">None</strong></span>
+        <span id="stt-privacy-badge" class="stt-privacy-badge" title="Speech Recognition Mode">● Local (WebGPU)</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <span class="developer-credit">Developed by <strong>Akash</strong></span>
+      <span class="shortcut-tip">Shortcut: <kbd>Ctrl+Shift+X</kbd></span>
+    </footer>
+  </div>
+
+  <!--
+    NOTE: vendor/transformers.js is an ES module bundle. Loading it with a classic
+    <script> tag throws "Unexpected token 'export'" and never defines
+    window.transformers. The Local STT engine loads it via dynamic
+    import(chrome.runtime.getURL('vendor/transformers.js')) instead.
+  -->
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

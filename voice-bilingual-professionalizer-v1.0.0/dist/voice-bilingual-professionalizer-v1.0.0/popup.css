@@ -1,0 +1,970 @@
+/* Voice Bilingual Professionalizer - Glossy Neumorphic Soft UI (Derived from reference.png) */
+:root {
+  /* Soft Neumorphic Canvas & Surfaces */
+  --bg-canvas: #eef2f7;
+  --bg-surface: #edf2f8;
+  --bg-surface-elevated: #f4f7fc;
+  --bg-recessed: #e4eaf2;
+
+  /* Subtle Crisp Edge Highlights */
+  --border-subtle: rgba(255, 255, 255, 0.85);
+  --border-rim: rgba(255, 255, 255, 0.95);
+  --border-dark-rim: rgba(163, 177, 198, 0.35);
+  --border-focus: #38bdf8;
+
+  /* Neumorphic Shadow Tokens from reference.png */
+  /* Raised Soft Elevation (Card & Applet) */
+  --shadow-card: -10px -10px 24px #ffffff, 12px 14px 28px rgba(166, 180, 200, 0.45);
+  /* Raised Extruded Buttons */
+  --shadow-raised-btn: -3px -3px 7px #ffffff, 3px 4px 8px rgba(166, 180, 200, 0.42);
+  --shadow-raised-btn-hover: -4px -4px 9px #ffffff, 4px 6px 11px rgba(166, 180, 200, 0.48);
+  /* Pressed / Recessed Inset Shadow (Like the OTP input boxes in reference.png) */
+  --shadow-inset-field: inset 3px 3px 6px rgba(166, 180, 200, 0.45), inset -3px -3px 6px #ffffff;
+  --shadow-inset-field-focus: inset 3px 3px 6px rgba(14, 165, 233, 0.25), inset -3px -3px 6px #ffffff, 0 0 0 2px rgba(56, 189, 248, 0.4);
+  /* Recessed Pressed Button */
+  --shadow-pressed-btn: inset 2px 2px 4px rgba(166, 180, 200, 0.45), inset -2px -2px 4px #ffffff;
+
+  /* High Legibility Slate & Charcoal Typography */
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+
+  /* Premium Accents */
+  --accent-cyan: #0284c7;
+  --accent-blue: #0284c7;
+  --accent-green: #059669;
+  --accent-red: #e11d48;
+
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-bn: 'Noto Sans Bengali', var(--font-sans);
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* FIXED MAXIMUM POPUP SIZE (height fix): 320 x 390. This is the MAXIMUM -
+   the window may be SMALLER when the current state needs less height
+   (measured pinning / collapse), never taller. If content ever exceeds the
+   cap, .content-body scrolls internally instead of clipping the footer. */
+body {
+  width: 320px;
+  max-width: 320px;
+  max-height: 390px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  line-height: 1.35;
+  overflow: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.detached-mode {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+}
+
+.app-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(145deg, #f7f9fd 0%, #edf2f8 100%);
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: linear-gradient(180deg, #f8fafd 0%, #edf2f8 100%);
+  border-bottom: 1px solid rgba(166, 180, 200, 0.25);
+  box-shadow: 0 1px 3px rgba(166, 180, 200, 0.15);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.brand-icon {
+  font-size: 14px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));
+}
+
+.brand-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #1e293b;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Running API Key Banner */
+.api-status-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 12px;
+  background: #e8eef6;
+  border-bottom: 1px solid rgba(166, 180, 200, 0.25);
+  box-shadow: inset 0 1px 2px rgba(166, 180, 200, 0.15);
+  font-size: 10px;
+}
+
+.api-status-left {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.live-dot {
+  width: 6.5px;
+  height: 6.5px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
+  animation: pulse-dot 1.8s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+.api-text {
+  color: #475569;
+  font-weight: 500;
+}
+
+.api-text strong {
+  color: #059669;
+  font-weight: 700;
+}
+
+.stt-privacy-badge {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 1.5px 5.5px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  white-space: nowrap;
+}
+
+.popout-btn {
+  background: linear-gradient(145deg, #ffffff, #e1e7f0);
+  border: 1px solid var(--border-rim);
+  color: #0369a1;
+  padding: 2.5px 7px;
+  border-radius: 6px;
+  font-size: 9.5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: -2px -2px 5px #ffffff, 2px 2px 5px rgba(166, 180, 200, 0.35);
+  transition: all 0.15s ease;
+}
+
+.popout-btn:hover {
+  box-shadow: -1px -1px 3px #ffffff, 1px 1px 3px rgba(166, 180, 200, 0.45);
+  color: #0284c7;
+}
+
+.popout-btn:active {
+  box-shadow: var(--shadow-pressed-btn);
+}
+
+.icon-btn {
+  background: linear-gradient(145deg, #ffffff, #e3e9f2);
+  border: 1px solid var(--border-rim);
+  color: #475569;
+  cursor: pointer;
+  padding: 4.5px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: -2px -2px 5px #ffffff, 2px 2px 5px rgba(166, 180, 200, 0.35);
+  transition: all 0.15s ease;
+}
+
+.icon-btn:hover {
+  color: #0f172a;
+  transform: translateY(-0.5px);
+}
+
+.icon-btn:active {
+  box-shadow: var(--shadow-pressed-btn);
+  transform: translateY(0);
+}
+
+/* Content Body � scrolls internally if content ever exceeds the fixed maximum,
+   so the footer and header never get clipped. */
+.content-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 7px 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stage-section {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+}
+
+.stage-section.active {
+  display: flex;
+}
+
+/* Voice Action Row: Voice Icon (Far Left) -> Bangla + English (Strictly Centered) -> Timer (Far Right) */
+.voice-action-row, .voice-center-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 5px 9px;
+  margin-bottom: 7px;
+  background: linear-gradient(145deg, #f8fafd, #e8eef6);
+  border: 1px solid var(--border-rim);
+  border-radius: 12px;
+  box-shadow: -4px -4px 10px #ffffff, 4px 5px 12px rgba(166, 180, 200, 0.35);
+}
+
+/* 1. Far Left Voice Icon Wrapper */
+.mic-icon-wrapper {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  justify-self: start;
+  flex-shrink: 0;
+}
+
+.pulse-ring-compact {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(2, 132, 199, 0.2);
+  transform: scale(0.9);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.pulse-ring-compact.recording {
+  opacity: 1;
+  animation: pulse-ring-anim 1.5s infinite ease-out;
+}
+
+@keyframes pulse-ring-anim {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.mic-btn-compact {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border-rim);
+  background: linear-gradient(145deg, #0ea5e9, #0284c7);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: -2px -2px 6px #ffffff, 3px 4px 8px rgba(2, 132, 199, 0.4);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.mic-btn-compact:hover {
+  transform: scale(1.05);
+  box-shadow: -3px -3px 8px #ffffff, 4px 6px 12px rgba(2, 132, 199, 0.48);
+}
+
+.mic-btn-compact:active {
+  transform: scale(0.96);
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.mic-btn-compact.recording {
+  background: linear-gradient(145deg, #f43f5e, #dc2626);
+  box-shadow: -2px -2px 6px #ffffff, 3px 4px 10px rgba(225, 29, 72, 0.5);
+  animation: pulse-mic 1.2s infinite ease-in-out;
+}
+
+@keyframes pulse-mic {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+/* Language Mode Compact Chip - Neumorphic Inset Tray */
+.lang-strip-mini {
+  display: flex;
+  justify-self: center;
+  background: var(--bg-recessed);
+  border: 1px solid rgba(166, 180, 200, 0.3);
+  border-radius: 8px;
+  padding: 2.5px;
+  gap: 2.5px;
+  box-shadow: inset 2px 2px 4px rgba(166, 180, 200, 0.4), inset -2px -2px 4px #ffffff;
+}
+
+.lang-chip-mini {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #64748b;
+  padding: 2.5px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lang-chip-mini input {
+  display: none;
+}
+
+.lang-chip-mini:has(input:checked) {
+  background: linear-gradient(145deg, #ffffff, #e6ecf5);
+  color: #0369a1;
+  box-shadow: -2px -2px 5px #ffffff, 2px 3px 6px rgba(166, 180, 200, 0.4);
+}
+
+/* Timer / Status Compact Badge on far right */
+.timer-badge-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-self: end;
+  min-width: 44px;
+}
+
+.timer-compact {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #0284c7;
+  line-height: 1.1;
+  text-shadow: 0 1px 1px #ffffff;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Transcript Preview Box: Neumorphic Recessed Inset Tray (Like the OTP inputs in reference.png) */
+.transcript-box {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-rim);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 7px;
+  box-shadow: -4px -4px 10px #ffffff, 4px 5px 12px rgba(166, 180, 200, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.transcript-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 9px;
+  background: linear-gradient(180deg, #f9fbfd 0%, #edf2f8 100%);
+  border-bottom: 1px solid rgba(166, 180, 200, 0.25);
+}
+
+.transcript-box-title {
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.transcript-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.voice-stack-pill {
+  font-size: 8.5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(2, 132, 199, 0.1);
+  color: #0369a1;
+  border: 1px solid rgba(2, 132, 199, 0.25);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.voice-stack-pill strong {
+  font-weight: 700;
+  color: #0284c7;
+}
+
+.voice-stack-pill.local-webgpu {
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.voice-stack-pill.local-webgpu strong {
+  color: #059669;
+}
+
+.voice-stack-pill.local-cpu {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.voice-stack-pill.local-cpu strong {
+  color: #d97706;
+}
+
+.transcript-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mini-action-btn {
+  background: linear-gradient(145deg, #ffffff, #e5ebf4);
+  border: 1px solid var(--border-rim);
+  color: #0284c7;
+  font-size: 9.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 1.5px 5.5px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  box-shadow: -1.5px -1.5px 4px #ffffff, 1.5px 2px 4px rgba(166, 180, 200, 0.35);
+  transition: all 0.15s ease;
+}
+
+.mini-action-btn:hover:not(:disabled) {
+  transform: translateY(-0.5px);
+  color: #0369a1;
+}
+
+.mini-action-btn:active:not(:disabled) {
+  box-shadow: var(--shadow-pressed-btn);
+  transform: translateY(0);
+}
+
+.mini-action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+  background: #e2e8f0;
+  color: #94a3b8;
+}
+
+.mini-action-btn.expand-btn {
+  color: #475569;
+}
+
+/* Recessed Inset Viewport for Text */
+.transcript-preview {
+  margin: 6px;
+  padding: 8px 10px;
+  font-size: 11px;
+  color: #1e293b;
+  line-height: 1.45;
+  user-select: text;
+  min-height: 110px;
+  max-height: 165px;
+  overflow-y: auto;
+  background-color: var(--bg-recessed);
+  border-radius: 9px;
+  border: 1px solid rgba(166, 180, 200, 0.25);
+  box-shadow: var(--shadow-inset-field);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Collapsed state */
+.transcript-box:not(.is-expanded) .transcript-preview,
+.transcript-box.is-collapsed .transcript-preview {
+  min-height: 34px;
+  max-height: 38px;
+  overflow-y: hidden;
+}
+
+/* Expanded state */
+.transcript-box.is-expanded .transcript-preview {
+  min-height: 110px;
+  max-height: 165px;
+  overflow-y: auto;
+}
+
+.transcript-preview.empty {
+  color: #94a3b8;
+}
+
+/* § EDITABLE INPUT: the transcript field is a textarea now — same styling,
+   same geometry, same recessed design; only editability is added. */
+textarea#transcript-preview {
+  display: block;
+  resize: none;
+  font-family: inherit;
+  cursor: text;
+}
+
+textarea#transcript-preview:focus {
+  outline: none;
+  box-shadow: var(--shadow-inset-field-focus);
+}
+
+textarea#transcript-preview::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+.preview-placeholder {
+  pointer-events: none;
+}
+
+/* Two Column Action Controls */
+.voice-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-top: 6px;
+}
+
+.voice-controls-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.voice-controls-col .btn {
+  width: 100%;
+}
+
+/* Raised Extruded Buttons (Matching reference.png VERIFY OTP button) */
+.btn {
+  padding: 7px 10px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: 1px solid var(--border-rim);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(145deg, #ffffff, #e5ebf4);
+  color: #1e293b;
+  box-shadow: var(--shadow-raised-btn);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-raised-btn-hover);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-pressed-btn);
+}
+
+.btn-stop {
+  background: linear-gradient(145deg, #fff1f2, #ffe4e6);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: #e11d48;
+}
+
+.btn-stop:hover:not(:disabled) {
+  background: linear-gradient(145deg, #ffe4e6, #fecdd3);
+  color: #be123c;
+}
+
+.btn-copy {
+  background: linear-gradient(145deg, #ffffff, #e6ecf5);
+  color: #0369a1;
+}
+
+/* Copy icon visibility (� UI fix): the UPPER icon-only copy button (transcript
+   header) keeps its large 20px glyph. DO NOT resize � it is already correct. */
+#btn-copy-header #copy-header-text {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* � VISIBILITY FIX: the clipboard emoji is a colored glyph, so CSS `color` does not
+   affect it. A contrast/saturation boost plus a soft drop-shadow makes it clearly
+   visible against the light neumorphic background without changing the icon design. */
+#btn-copy-header #copy-header-text,
+.copy-btn .copy-text {
+  filter: saturate(1.9) contrast(1.2) drop-shadow(0 1px 2px rgba(15, 23, 42, 0.5));
+}
+
+/* � UI balance fix: the Collapse/Expand icon must match the Copy icon size. */
+#btn-expand-transcript #expand-icon-svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Result-stage copy buttons are icon-only too (same size, same design). */
+.copy-btn .copy-text {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* � LOWER BUTTON FIX: the four bottom action buttons (Copy / Refine / Stop /
+   Cancel) are locked to exactly the same size. The lower Copy button is
+   text-based, so a shared fixed height guarantees pixel-equal sizing. */
+.voice-controls-grid .btn {
+  height: 31px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.btn-primary {
+  background: linear-gradient(145deg, #0284c7, #0369a1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: -2px -2px 6px #ffffff, 3px 4px 9px rgba(2, 132, 199, 0.4);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(145deg, #0369a1, #075985);
+  box-shadow: -3px -3px 8px #ffffff, 4px 6px 12px rgba(2, 132, 199, 0.48);
+}
+
+.btn-primary:active:not(:disabled) {
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.btn-secondary {
+  background: linear-gradient(145deg, #ffffff, #e5ebf4);
+  color: #475569;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  background: #e2e8f0;
+  border-color: rgba(166, 180, 200, 0.2);
+  color: #94a3b8;
+  transform: none !important;
+}
+
+/* 2. Loading Stage */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 35px 12px;
+  gap: 14px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3.5px solid rgba(2, 132, 199, 0.2);
+  border-top-color: #0284c7;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+}
+
+/* 3. Result Stage - Raised Neumorphic Cards */
+.result-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-rim);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  box-shadow: -4px -4px 10px #ffffff, 4px 5px 12px rgba(166, 180, 200, 0.3);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  padding: 5px 10px;
+  background: linear-gradient(180deg, #f9fbfd 0%, #edf2f8 100%);
+  border-bottom: 1px solid rgba(166, 180, 200, 0.25);
+}
+
+/* § RESULT EXPAND: title left, [copy][expand] buttons clustered right. */
+.card-header .card-title {
+  margin-right: auto;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flag {
+  font-size: 12px;
+}
+
+.card-name {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.copy-btn {
+  background: linear-gradient(145deg, #ffffff, #e5ebf4);
+  border: 1px solid var(--border-rim);
+  color: #0284c7;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2.5px 7px;
+  border-radius: 6px;
+  box-shadow: -1.5px -1.5px 4px #ffffff, 1.5px 2px 4px rgba(166, 180, 200, 0.35);
+  transition: all 0.15s ease;
+}
+
+.copy-btn:hover {
+  color: #0369a1;
+  transform: translateY(-0.5px);
+}
+
+.copy-btn:active {
+  box-shadow: var(--shadow-pressed-btn);
+  transform: translateY(0);
+}
+
+/* § RESULT ICON SIZE MATCH: in the Bangla/English result headers, the Copy
+   control is the size reference — the Expand/Collapse control gets the exact
+   same fixed outer box, padding, radius and icon scale. Positions, spacing
+   and functionality unchanged. */
+.result-card .card-header .copy-btn,
+.result-card .card-header .mini-action-btn.expand-btn {
+  width: 36px;
+  height: 27px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  border-radius: 6px;
+}
+
+.result-card .card-header .mini-action-btn.expand-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.card-content {
+  padding: 6px 8px;
+}
+
+/* Inset Neumorphic Result Textarea */
+.result-textarea {
+  width: 100%;
+  background-color: var(--bg-recessed);
+  border: 1px solid rgba(166, 180, 200, 0.25);
+  border-radius: 8px;
+  padding: 6px 8px;
+  color: #1e293b;
+  font-size: 11px;
+  line-height: 1.4;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  box-shadow: var(--shadow-inset-field);
+  /* § RESULT EXPAND: smooth vertical grow/shrink. Width never changes. */
+  transition: min-height 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    max-height 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.result-textarea:focus {
+  box-shadow: var(--shadow-inset-field-focus);
+}
+
+/* § RESULT EXPAND: vertically enlarged reading state. The default compact
+   height is untouched — only the toggled class grows the field. */
+.result-textarea.is-expanded {
+  min-height: 130px;
+  max-height: 190px;
+}
+
+.result-textarea.bn-font {
+  font-family: var(--font-bn);
+}
+
+.result-textarea.en-font {
+  font-family: var(--font-sans);
+}
+
+.result-actions {
+  display: flex;
+  gap: 7px;
+  margin-top: 5px;
+}
+
+.result-actions .btn {
+  flex: 1;
+}
+
+/* 4. Error Stage */
+.error-banner {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background-color: #fff1f2;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-inset-field);
+}
+
+.error-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.error-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #e11d48;
+  margin-bottom: 2px;
+}
+
+.error-desc {
+  font-size: 10.5px;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+.error-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.error-actions .btn {
+  flex: 1;
+}
+
+/* Footer */
+.app-footer {
+  padding: 5px 12px;
+  background: linear-gradient(180deg, #edf2f8 0%, #e2e8f0 100%);
+  border-top: 1px solid var(--border-rim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.developer-credit {
+  font-size: 9.5px;
+  color: #64748b;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-align: left;
+  margin-right: auto;
+}
+
+.developer-credit strong {
+  color: #0284c7;
+  font-weight: 700;
+}
+
+.shortcut-tip {
+  font-size: 9px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.shortcut-tip kbd {
+  background: linear-gradient(145deg, #ffffff, #e1e7f0);
+  border: 1px solid var(--border-rim);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: var(--font-mono);
+  color: #1e293b;
+  font-weight: 600;
+  box-shadow: -1px -1px 3px #ffffff, 1px 1px 3px rgba(166, 180, 200, 0.35);
+}
+
+/* ============================================================
+   � FINAL TOP ROW: centered brown title + Dock/Pin & Settings
+   sized to match the Voice Recorder key. Visual only.
+   ============================================================ */
+.header-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8a5a2b;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Size match: Dock/Pin + Settings keys adopt the Voice key's
+   30 � 30 dimensions and icon scale (same material/radius/inset). */
+#btn-popout,
+#btn-settings {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+}
+
+#btn-popout {
+  font-size: 16px;
+  line-height: 1;
+}
+
+#btn-settings svg {
+  width: 17px;
+  height: 17px;
+}
