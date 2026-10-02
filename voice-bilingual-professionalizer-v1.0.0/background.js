@@ -60,14 +60,14 @@ async function openOrFocusDetachedWindow() {
       }
     }
 
-    const pos = res.detachedWindowPos || { left: 140, top: 140, width: 320, height: 380 };
+    const pos = res.detachedWindowPos || { left: 140, top: 140, width: 320, height: 390 };
     const createArgs = {
       url: chrome.runtime.getURL('popup.html?mode=detached'),
       type: 'popup',
-      // § HEIGHT FIX: 380px is the MAXIMUM height — the detached window may be
-      // smaller but is never created larger than 320 × 380.
+      // § HEIGHT FIX: 390px is the MAXIMUM height — the detached window may be
+      // smaller but is never created larger than 320 × 390.
       width: Math.min(Math.max(290, pos.width || 320), 320),
-      height: Math.min(Math.max(200, pos.height || 380), 380),
+      height: Math.min(Math.max(200, pos.height || 390), 390),
       focused: true
     };
 

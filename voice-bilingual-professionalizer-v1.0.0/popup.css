@@ -46,14 +46,14 @@
   padding: 0;
 }
 
-/* FIXED MAXIMUM POPUP SIZE (height fix): 320 x 380. This is the MAXIMUM -
+/* FIXED MAXIMUM POPUP SIZE (height fix): 320 x 390. This is the MAXIMUM -
    the window may be SMALLER when the current state needs less height
    (measured pinning / collapse), never taller. If content ever exceeds the
    cap, .content-body scrolls internally instead of clipping the footer. */
 body {
   width: 320px;
   max-width: 320px;
-  max-height: 380px;
+  max-height: 390px;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -761,6 +761,27 @@ body.detached-mode {
 .copy-btn:active {
   box-shadow: var(--shadow-pressed-btn);
   transform: translateY(0);
+}
+
+/* § RESULT ICON SIZE MATCH: in the Bangla/English result headers, the Copy
+   control is the size reference — the Expand/Collapse control gets the exact
+   same fixed outer box, padding, radius and icon scale. Positions, spacing
+   and functionality unchanged. */
+.result-card .card-header .copy-btn,
+.result-card .card-header .mini-action-btn.expand-btn {
+  width: 36px;
+  height: 27px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  border-radius: 6px;
+}
+
+.result-card .card-header .mini-action-btn.expand-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
 .card-content {

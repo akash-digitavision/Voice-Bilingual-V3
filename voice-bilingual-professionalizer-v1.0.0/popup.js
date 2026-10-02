@@ -18,7 +18,7 @@ const POPUP_OPENED_AT = performance.now();
 // Windows may be smaller (collapsed transcript / user-resized detached window) but
 // never larger — enforced in-page for detached windows and at creation in background.
 const MAX_POPUP_WIDTH = 320;
-const MAX_POPUP_HEIGHT = 380;
+const MAX_POPUP_HEIGHT = 390;
 const MAX_COLLAPSED_HEIGHT = 340;
 
 function enforceMaxWindowSize() {

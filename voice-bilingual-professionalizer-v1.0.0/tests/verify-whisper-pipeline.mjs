@@ -1564,6 +1564,15 @@ async function scenarioCompactPopupUi() {
     popupJs.includes("btnCopyBn.addEventListener('click', () => handleCopy(btnCopyBn, outputBn))") &&
       popupJs.includes("btnCopyEn.addEventListener('click', () => handleCopy(btnCopyEn, outputEn))"));
 
+  // § RESULT ICON SIZE MATCH: Copy and Expand controls identical in each header.
+  check('result header Copy + Expand controls locked to the same exact box (36 x 27)',
+    /\.result-card \.card-header \.copy-btn,\s*\n\.result-card \.card-header \.mini-action-btn\.expand-btn\s*\{[^}]*width:\s*36px/.test(popupCss) &&
+      /\.result-card \.card-header \.copy-btn,\s*\n\.result-card \.card-header \.mini-action-btn\.expand-btn\s*\{[^}]*height:\s*27px/.test(popupCss) &&
+      /\.result-card \.card-header \.copy-btn,\s*\n\.result-card \.card-header \.mini-action-btn\.expand-btn\s*\{[^}]*padding:\s*0/.test(popupCss));
+  check('Expand icon scale matches the Copy emoji (20px) in result headers',
+    /\.result-card \.card-header \.mini-action-btn\.expand-btn svg\s*\{[^}]*width:\s*20px/.test(popupCss) &&
+      /\.result-card \.card-header \.mini-action-btn\.expand-btn svg\s*\{[^}]*height:\s*20px/.test(popupCss));
+
   // § FOUR-BUTTON FIX: Copy / Refine / Stop / Cancel are locked to identical size.
   check('four lower buttons locked to exactly the same size (height 31px)',
     /\.voice-controls-grid \.btn\s*\{[^}]*height:\s*31px/.test(popupCss) &&
@@ -1572,25 +1581,26 @@ async function scenarioCompactPopupUi() {
     popupHtml.includes('id="btn-copy-original"') && popupHtml.includes('id="btn-refine"') &&
       popupHtml.includes('id="btn-stop"') && popupHtml.includes('id="btn-cancel"'));
 
-  // 9. Popup MAXIMUM height is exactly 380px — smaller allowed, never taller.
-  check('CSS caps the popup at the 380px maximum height (320 wide)',
+  // 9. Popup MAXIMUM height is exactly 390px — smaller allowed, never taller.
+  check('CSS caps the popup at the 390px maximum height (320 wide)',
     /body\s*\{[^}]*max-width:\s*320px/.test(popupCss) &&
-      /body\s*\{[^}]*max-height:\s*380px/.test(popupCss));
+      /body\s*\{[^}]*max-height:\s*390px/.test(popupCss));
   check('content body scrolls internally instead of clipping',
     /content-body\s*\{[^}]*overflow-y:\s*auto/.test(popupCss) &&
       /content-body\s*\{[^}]*min-height:\s*0/.test(popupCss));
   check('detached window resize targets are clamped to the maximum',
-    popupJs.includes('MAX_POPUP_WIDTH') && popupJs.includes('MAX_POPUP_HEIGHT = 380') &&
+    popupJs.includes('MAX_POPUP_WIDTH') && popupJs.includes('MAX_POPUP_HEIGHT = 390') &&
       popupJs.includes('Math.min(targetHeight, MAX_POPUP_HEIGHT)'));
   check('detached window enforces the maximum on user resize',
     popupJs.includes('enforceMaxWindowSize') &&
       popupJs.includes("window.addEventListener('resize', enforceMaxWindowSize)"));
-  check('background clamps detached window creation to 380px',
+  check('background clamps detached window creation to 390px',
     backgroundJs.includes('Math.min(Math.max(290, pos.width || 320), 320)') &&
-      backgroundJs.includes('Math.min(Math.max(200, pos.height || 380), 380)'));
+      backgroundJs.includes('Math.min(Math.max(200, pos.height || 390), 390)'));
   check('no stale height constant remains',
     !popupJs.includes('MAX_POPUP_HEIGHT = 430') && !popupJs.includes('MAX_POPUP_HEIGHT = 420') &&
-      !popupJs.includes('MAX_POPUP_HEIGHT = 375') && !popupJs.includes('MAX_POPUP_HEIGHT = 378'));
+      !popupJs.includes('MAX_POPUP_HEIGHT = 375') && !popupJs.includes('MAX_POPUP_HEIGHT = 378') &&
+      !popupJs.includes('MAX_POPUP_HEIGHT = 380') && !popupJs.includes('MAX_POPUP_HEIGHT = 385'));
 
   // § COLLAPSE/EXPAND HEIGHT AUTO-ADJUST: the popup must actively resize on
   // collapse/expand (browsers never shrink it themselves — blank-area bug).
