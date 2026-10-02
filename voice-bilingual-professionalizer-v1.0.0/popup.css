@@ -46,10 +46,10 @@
   padding: 0;
 }
 
-/* FIXED MAXIMUM POPUP SIZE (§ layout fix):
-   320 × 430 is selected from the ACTUAL COMPLETE rendered voice-stage layout
-   (header → API row → mic row → expanded transcript with the enlarged header
-   icons → four equal action buttons → footer) measured top to bottom, plus a
+/* FIXED MAXIMUM POPUP SIZE (� layout fix):
+   320 � 430 is selected from the ACTUAL COMPLETE rendered voice-stage layout
+   (header ? API row ? mic row ? expanded transcript with the enlarged header
+   icons ? four equal action buttons ? footer) measured top to bottom, plus a
    safety margin for font-metric variance. The window may be SMALLER than this
    (collapsed transcript / user-resized detached window), but it can never exceed
    it. If content ever exceeds the cap, .content-body scrolls internally instead
@@ -223,7 +223,7 @@ body.detached-mode {
   transform: translateY(0);
 }
 
-/* Content Body — scrolls internally if content ever exceeds the fixed maximum,
+/* Content Body � scrolls internally if content ever exceeds the fixed maximum,
    so the footer and header never get clipped. */
 .content-body {
   flex: 1 1 auto;
@@ -606,14 +606,14 @@ body.detached-mode {
   color: #0369a1;
 }
 
-/* Copy icon visibility (§ UI fix): the UPPER icon-only copy button (transcript
-   header) keeps its large 20px glyph. DO NOT resize — it is already correct. */
+/* Copy icon visibility (� UI fix): the UPPER icon-only copy button (transcript
+   header) keeps its large 20px glyph. DO NOT resize � it is already correct. */
 #btn-copy-header #copy-header-text {
   font-size: 20px;
   line-height: 1;
 }
 
-/* § VISIBILITY FIX: the clipboard emoji is a colored glyph, so CSS `color` does not
+/* � VISIBILITY FIX: the clipboard emoji is a colored glyph, so CSS `color` does not
    affect it. A contrast/saturation boost plus a soft drop-shadow makes it clearly
    visible against the light neumorphic background without changing the icon design. */
 #btn-copy-header #copy-header-text,
@@ -621,7 +621,7 @@ body.detached-mode {
   filter: saturate(1.9) contrast(1.2) drop-shadow(0 1px 2px rgba(15, 23, 42, 0.5));
 }
 
-/* § UI balance fix: the Collapse/Expand icon must match the Copy icon size. */
+/* � UI balance fix: the Collapse/Expand icon must match the Copy icon size. */
 #btn-expand-transcript #expand-icon-svg {
   width: 20px;
   height: 20px;
@@ -633,7 +633,7 @@ body.detached-mode {
   line-height: 1;
 }
 
-/* § LOWER BUTTON FIX: the four bottom action buttons (Copy / Refine / Stop /
+/* � LOWER BUTTON FIX: the four bottom action buttons (Copy / Refine / Stop /
    Cancel) are locked to exactly the same size. The lower Copy button is
    text-based, so a shared fixed height guarantees pixel-equal sizing. */
 .voice-controls-grid .btn {
@@ -883,4 +883,36 @@ body.detached-mode {
   color: #1e293b;
   font-weight: 600;
   box-shadow: -1px -1px 3px #ffffff, 1px 1px 3px rgba(166, 180, 200, 0.35);
+}
+
+/* ============================================================
+   � FINAL TOP ROW: centered brown title + Dock/Pin & Settings
+   sized to match the Voice Recorder key. Visual only.
+   ============================================================ */
+.header-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8a5a2b;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Size match: Dock/Pin + Settings keys adopt the Voice key's
+   30 � 30 dimensions and icon scale (same material/radius/inset). */
+#btn-popout,
+#btn-settings {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+}
+
+#btn-popout {
+  font-size: 16px;
+  line-height: 1;
+}
+
+#btn-settings svg {
+  width: 17px;
+  height: 17px;
 }

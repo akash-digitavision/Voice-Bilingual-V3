@@ -70,6 +70,17 @@ const btnCancel = document.getElementById('btn-cancel');
 const langBn = document.getElementById('lang-bn');
 const langEn = document.getElementById('lang-en');
 
+/**
+ * § CLEANUP: the Bangla/English/Timer row was removed from the UI. The language
+ * radios may therefore be absent — fall back to the prior default (Bangla) so
+ * recognition behavior stays consistent without the removed controls.
+ */
+function selectedPopupLanguage() {
+  if (langBn && langBn.checked) return 'bn-BD';
+  if (langEn && langEn.checked) return 'en-US';
+  return 'bn-BD';
+}
+
 const outputBn = document.getElementById('output-bn');
 const outputEn = document.getElementById('output-en');
 const btnCopyBn = document.getElementById('btn-copy-bn');
@@ -121,6 +132,7 @@ function setStage(stage) {
 
 function updateTimer() {
   if (!recordingStartTime) return;
+  if (!recordingTimer) return; // § cleanup: timer display removed from the UI
   const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
   const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
   const secs = String(elapsed % 60).padStart(2, '0');
@@ -176,7 +188,7 @@ function updatePrivacyBadge(device = 'WebGPU') {
 }
 
 function initSpeech() {
-  const selectedLang = langBn.checked ? 'bn-BD' : 'en-US';
+  const selectedLang = selectedPopupLanguage();
 
   // Never orphan a previous recognition instance: abort it before replacing it, so a
   // stale browser-side speech session cannot collide with the fresh popup's session
@@ -388,7 +400,7 @@ async function startRecording() {
     try {
       const resp = await whisperCommand({
         action: 'RECORD_START',
-        language: langBn.checked ? 'bn' : 'en',
+        language: selectedPopupLanguage() === 'en-US' ? 'en' : 'bn',
         modelId: settings?.localModel || 'onnx-community/whisper-base',
         devicePreference: settings?.accelerationPreference || 'auto'
       });
@@ -482,7 +494,7 @@ async function stopRecording() {
     transcriptPreview.classList.remove('empty');
     transcriptPreview.textContent = 'Transcribing on-device with Whisper...';
     try {
-      const selectedLang = langBn.checked ? 'bn' : 'en';
+      const selectedLang = selectedPopupLanguage() === 'en-US' ? 'en' : 'bn';
       const resp = await whisperCommand({ action: 'RECORD_STOP', language: selectedLang });
 
       if (!resp.ok) {
@@ -595,7 +607,7 @@ function cancelRecording() {
   btnCopyHeader.disabled = true;
   currentTranscript = '';
   if (statusLabel) statusLabel.textContent = '';
-  recordingTimer.textContent = '00:00';
+  if (recordingTimer) recordingTimer.textContent = '00:00';
   transcriptPreview.classList.add('empty');
   transcriptPreview.textContent = '';
 }
@@ -726,13 +738,14 @@ if (btnCopyHeader) {
 
 btnCancel.addEventListener('click', cancelRecording);
 
-langBn.addEventListener('change', () => {
+// § cleanup: the language chips were removed from the UI — guard the listeners.
+if (langBn) langBn.addEventListener('change', () => {
   if (speech && speech.isRecording) {
     speech.setLanguage('bn-BD');
   }
 });
 
-langEn.addEventListener('change', () => {
+if (langEn) langEn.addEventListener('change', () => {
   if (speech && speech.isRecording) {
     speech.setLanguage('en-US');
   }

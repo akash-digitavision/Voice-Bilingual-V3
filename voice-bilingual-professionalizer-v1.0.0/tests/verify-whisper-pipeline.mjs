@@ -1424,22 +1424,49 @@ async function scenarioCompactPopupUi() {
     /id="btn-popout"[^>]*title="Toggle free movable window"/.test(popupHtml) &&
       /id="btn-popout"[^>]*aria-label="Toggle free movable window"/.test(popupHtml));
 
-  // 3. § LAYOUT REARRANGEMENT: Input Text Field now sits ABOVE the Voice row.
+  // 3. § LAYOUT: Input Text Field leads the stage; the Bangla/English/Timer row
+  //    was removed entirely (§ cleanup) so the field is directly followed by the
+  //    action grid.
   const voiceRowPos = popupHtml.indexOf('class="voice-action-row"');
   const transcriptPos = popupHtml.indexOf('id="transcript-box"');
-  check('Input Text Field appears ABOVE the Voice control row (DOM order)',
-    transcriptPos > -1 && voiceRowPos > -1 && transcriptPos < voiceRowPos,
-    { transcriptPos, voiceRowPos });
-  check('no duplicated Input Text Field or Voice row',
+  const gridPos = popupHtml.indexOf('class="voice-controls-grid"');
+  check('Input Text Field directly precedes the action grid (Voice row removed)',
+    transcriptPos > -1 && gridPos > transcriptPos && voiceRowPos === -1,
+    { transcriptPos, gridPos, voiceRowPos });
+  check('no duplicated Input Text Field; Voice row fully removed (no blank wrapper)',
     (popupHtml.match(/id="transcript-box"/g) || []).length === 1 &&
-      (popupHtml.match(/class="voice-action-row"/g) || []).length === 1);
-  check('Voice Stack pill moved with the transcript box (single instance, above Voice row)',
+      (popupHtml.match(/class="voice-action-row"/g) || []).length === 0);
+  check('Voice Stack pill single instance, inside the transcript box',
     (popupHtml.match(/id="voice-stack-badge"/g) || []).length === 1 &&
-      popupHtml.indexOf('id="voice-stack-badge"') < voiceRowPos);
+      popupHtml.indexOf('id="voice-stack-badge"') < gridPos);
   check('bottom action row still follows after the Voice row and transcript',
-    popupHtml.indexOf('class="voice-controls-grid"') > voiceRowPos);
+    gridPos > transcriptPos);
   check('Input Text Field label retained as in the restored baseline',
     popupHtml.includes('Input Text Field'));
+
+  // § FINAL TOP ROW FIX: Voice Recorder LEFT; Dock/Pin + Settings RIGHT.
+  const headerPos = popupHtml.indexOf('class="header-actions"');
+  const micPos = popupHtml.indexOf('id="btn-mic"');
+  const popoutPos = popupHtml.indexOf('id="btn-popout"', headerPos);
+  const settingsPos = popupHtml.indexOf('id="btn-settings"', headerPos);
+  check('top row: Voice key sits LEFT of the header-actions group',
+    micPos > -1 && micPos < headerPos, { micPos, headerPos });
+  check('top row: Dock/Pin + Settings are the RIGHT group inside header-actions',
+    popoutPos > headerPos && settingsPos > popoutPos, { popoutPos, settingsPos });
+  check('top order is Voice → Dock/Pin → Settings (no duplicates)',
+    micPos > -1 && popoutPos > -1 && settingsPos > -1 &&
+      micPos < popoutPos && popoutPos < settingsPos);
+  check('Voice key exists exactly once (moved, not duplicated)',
+    (popupHtml.match(/id="btn-mic"/g) || []).length === 1 &&
+      (popupHtml.match(/class="mic-icon-wrapper"/g) || []).length === 1);
+  check('Voice key removed from the old second row',
+    popupHtml.slice(popupHtml.indexOf('class="voice-action-row"')).indexOf('id="btn-mic"') === -1);
+  check('Dock/Pin key exists exactly once (moved, not duplicated)',
+    (popupHtml.match(/id="btn-popout"/g) || []).length === 1);
+  check('Running API banner moved below the action grid, before the footer',
+    popupHtml.indexOf('id="popup-api-banner"') > popupHtml.indexOf('class="voice-controls-grid"') &&
+      popupHtml.indexOf('id="popup-api-banner"') < popupHtml.indexOf('<footer class="app-footer"') &&
+      (popupHtml.match(/id="popup-api-banner"/g) || []).length === 1);
 
   // 4. Voice Stack label removed; dynamic stack name retained.
   check('"Voice Stack:" prefix removed',
@@ -1493,6 +1520,30 @@ async function scenarioCompactPopupUi() {
   check('lower Copy button is text-based ("Copy")',
     /id="btn-copy-original"[^>]*>\s*<span>Copy<\/span>/.test(popupHtml) &&
       !popupHtml.includes('<span>📋</span>'));
+
+  // § FINAL TOP ROW & CLEANUP: centered brown title, key size match, section removal.
+  check('header has the centered brown "Voice Assistant" title between the key groups',
+    popupHtml.includes('<span class="header-title">Voice Assistant</span>') &&
+      /\.header-title\s*\{[^}]*color:\s*#8a5a2b/.test(popupCss) &&
+      popupHtml.indexOf('header-title') > popupHtml.indexOf('id="btn-mic"') &&
+      popupHtml.indexOf('header-title') < popupHtml.indexOf('class="header-actions"'));
+  check('Dock/Pin + Settings keys sized to match the Voice key (30px)',
+    /#btn-popout,\s*\n#btn-settings\s*\{[^}]*width:\s*30px/.test(popupCss) &&
+      /#btn-popout,\s*\n#btn-settings\s*\{[^}]*height:\s*30px/.test(popupCss));
+  check('Settings icon scale matches the Voice key icon (17px)',
+    /#btn-settings svg\s*\{[^}]*width:\s*17px/.test(popupCss));
+  check('Bangla/English/Timer section fully removed (no leftover wrapper)',
+    !popupHtml.includes('lang-strip-mini') && !popupHtml.includes('lang-chip-mini') &&
+      !popupHtml.includes('timer-badge-mini') && !popupHtml.includes('lang-bn') &&
+      !popupHtml.includes('recording-timer') && !popupHtml.includes('voice-action-row'));
+  check('language falls back to Bangla default; timer code is null-safe',
+    popupJs.includes('function selectedPopupLanguage') &&
+      popupJs.includes('if (!recordingTimer) return;') &&
+      popupJs.includes('if (langBn) langBn.addEventListener'));
+  check('four lower keys show exactly Copy / Refine / Stop / Close (no icons)',
+    popupHtml.includes('<span>Copy</span>') && popupHtml.includes('<span>Refine</span>') &&
+      popupHtml.includes('<span>Stop</span>') && popupHtml.includes('<span>Close</span>') &&
+      !popupHtml.includes('✨') && !popupHtml.includes('■ Stop') && !popupHtml.includes('✕ Cancel'));
 
   // § FOUR-BUTTON FIX: Copy / Refine / Stop / Cancel are locked to identical size.
   check('four lower buttons locked to exactly the same size (height 31px)',

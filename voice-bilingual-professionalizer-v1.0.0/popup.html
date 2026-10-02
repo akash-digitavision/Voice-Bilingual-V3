@@ -23,30 +23,28 @@
 </head>
 <body>
   <div class="app-container" id="app-container">
-    <!-- Header -->
+    <!-- Header — § FINAL TOP ROW: Voice Recorder LEFT · "Voice Assistant" CENTER (brown) ·
+         Dock/Pin + Settings RIGHT. All three keys share the same recessed material. -->
     <header class="app-header">
-      <div class="brand">
-        <span class="brand-icon">🎙</span>
-        <span class="brand-title">Voice Professionalizer</span>
+      <!-- LEFT: functional Voice Recorder key -->
+      <div class="mic-icon-wrapper">
+        <div id="mic-pulse-ring" class="pulse-ring-compact"></div>
+        <button id="btn-mic" class="mic-btn-compact" aria-label="Toggle Recording" title="Click to speak/stop">
+          <svg id="mic-svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
       </div>
+      <!-- CENTER: title label — brown, not a control -->
+      <span class="header-title">Voice Assistant</span>
+      <!-- RIGHT: Dock/Pin + Settings keys -->
       <div class="header-actions">
+        <button id="btn-popout" class="popout-btn" title="Toggle free movable window" aria-label="Toggle free movable window">
+          <span id="popout-label">⤢</span>
+        </button>
         <button id="btn-settings" class="icon-btn" title="Settings" aria-label="Open Settings">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
       </div>
     </header>
-
-    <!-- Running API Key & Privacy Indicator Bar -->
-    <div id="popup-api-banner" class="api-status-banner">
-      <div class="api-status-left">
-        <span class="live-dot" id="popup-live-dot"></span>
-        <span class="api-text">Running API: <strong id="popup-api-name">None</strong></span>
-        <span id="stt-privacy-badge" class="stt-privacy-badge" title="Speech Recognition Mode">● Local (WebGPU)</span>
-      </div>
-      <button id="btn-popout" class="popout-btn" title="Toggle free movable window" aria-label="Toggle free movable window">
-        <span id="popout-label">⤢</span>
-      </button>
-    </div>
 
     <!-- Main Content Body -->
     <main class="content-body">
@@ -75,34 +73,9 @@
           </div>
         </div>
 
-        <!-- Voice Action Row: Voice Icon (Far Left) -> Bangla + English (Center) -> Timer (Far Right) -->
-        <div class="voice-action-row">
-          <!-- 1. Voice Icon on the Far Left -->
-          <div class="mic-icon-wrapper">
-            <div id="mic-pulse-ring" class="pulse-ring-compact"></div>
-            <button id="btn-mic" class="mic-btn-compact" aria-label="Toggle Recording" title="Click to speak/stop">
-              <svg id="mic-svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-            </button>
-          </div>
-
-          <!-- 2. Bangla & English Buttons in the Center -->
-          <div class="lang-strip-mini">
-            <label class="lang-chip-mini">
-              <input type="radio" name="lang" value="bn-BD" id="lang-bn" checked>
-              <span>🇧🇩 BN</span>
-            </label>
-            <label class="lang-chip-mini">
-              <input type="radio" name="lang" value="en-US" id="lang-en">
-              <span>🇬🇧 EN</span>
-            </label>
-          </div>
-
-          <!-- 3. Timer on the Far Right -->
-          <div class="timer-badge-mini">
-            <span id="recording-timer" class="timer-compact tabular-nums">00:00</span>
-          </div>
-        </div>
-
+        <!-- § CLEANUP: the Bangla/English/Timer row was removed per instruction —
+             language defaults to Bangla (the prior checked default) and the timer
+             is no longer displayed. The row container is gone entirely. -->
         <!-- Control Actions Below Text Field: Two Columns -->
         <!-- Left column: Copy and Refine | Right column: Stop and Cancel -->
         <div class="voice-controls-grid">
@@ -112,17 +85,17 @@
               <span>Copy</span>
             </button>
             <button id="btn-refine" class="btn btn-primary" disabled title="Refine into professional versions">
-              <span>✨ Refine</span>
+              <span>Refine</span>
             </button>
           </div>
 
-          <!-- Right Column: Stop and Cancel -->
+          <!-- Right Column: Stop and Close -->
           <div class="voice-controls-col">
             <button id="btn-stop" class="btn btn-stop" disabled title="Stop voice recording">
-              <span>■ Stop</span>
+              <span>Stop</span>
             </button>
-            <button id="btn-cancel" class="btn btn-secondary" title="Cancel recording">
-              <span>✕ Cancel</span>
+            <button id="btn-cancel" class="btn btn-secondary" title="Close recording" aria-label="Close">
+              <span>Close</span>
             </button>
           </div>
         </div>
@@ -198,6 +171,15 @@
         </div>
       </section>
     </main>
+
+    <!-- § layout rearrangement: Running API row moved to the lower section (§8/§9) -->
+    <div id="popup-api-banner" class="api-status-banner">
+      <div class="api-status-left">
+        <span class="live-dot" id="popup-live-dot"></span>
+        <span class="api-text">Running API: <strong id="popup-api-name">None</strong></span>
+        <span id="stt-privacy-badge" class="stt-privacy-badge" title="Speech Recognition Mode">● Local (WebGPU)</span>
+      </div>
+    </div>
 
     <!-- Footer -->
     <footer class="app-footer">
