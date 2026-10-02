@@ -46,18 +46,14 @@
   padding: 0;
 }
 
-/* FIXED MAXIMUM POPUP SIZE (� layout fix):
-   320 � 430 is selected from the ACTUAL COMPLETE rendered voice-stage layout
-   (header ? API row ? mic row ? expanded transcript with the enlarged header
-   icons ? four equal action buttons ? footer) measured top to bottom, plus a
-   safety margin for font-metric variance. The window may be SMALLER than this
-   (collapsed transcript / user-resized detached window), but it can never exceed
-   it. If content ever exceeds the cap, .content-body scrolls internally instead
-   of clipping the action buttons or footer. */
+/* FIXED MAXIMUM POPUP SIZE (height fix): 320 x 380. This is the MAXIMUM -
+   the window may be SMALLER when the current state needs less height
+   (measured pinning / collapse), never taller. If content ever exceeds the
+   cap, .content-body scrolls internally instead of clipping the footer. */
 body {
   width: 320px;
   max-width: 320px;
-  max-height: 430px;
+  max-height: 380px;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -717,9 +713,15 @@ body.detached-mode {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 5px;
   padding: 5px 10px;
   background: linear-gradient(180deg, #f9fbfd 0%, #edf2f8 100%);
   border-bottom: 1px solid rgba(166, 180, 200, 0.25);
+}
+
+/* § RESULT EXPAND: title left, [copy][expand] buttons clustered right. */
+.card-header .card-title {
+  margin-right: auto;
 }
 
 .card-title {
@@ -779,10 +781,20 @@ body.detached-mode {
   outline: none;
   font-family: inherit;
   box-shadow: var(--shadow-inset-field);
+  /* § RESULT EXPAND: smooth vertical grow/shrink. Width never changes. */
+  transition: min-height 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    max-height 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .result-textarea:focus {
   box-shadow: var(--shadow-inset-field-focus);
+}
+
+/* § RESULT EXPAND: vertically enlarged reading state. The default compact
+   height is untouched — only the toggled class grows the field. */
+.result-textarea.is-expanded {
+  min-height: 130px;
+  max-height: 190px;
 }
 
 .result-textarea.bn-font {

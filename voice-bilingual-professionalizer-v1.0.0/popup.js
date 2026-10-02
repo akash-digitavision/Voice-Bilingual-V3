@@ -18,7 +18,7 @@ const POPUP_OPENED_AT = performance.now();
 // Windows may be smaller (collapsed transcript / user-resized detached window) but
 // never larger — enforced in-page for detached windows and at creation in background.
 const MAX_POPUP_WIDTH = 320;
-const MAX_POPUP_HEIGHT = 430;
+const MAX_POPUP_HEIGHT = 380;
 const MAX_COLLAPSED_HEIGHT = 340;
 
 function enforceMaxWindowSize() {
@@ -85,6 +85,11 @@ const outputBn = document.getElementById('output-bn');
 const outputEn = document.getElementById('output-en');
 const btnCopyBn = document.getElementById('btn-copy-bn');
 const btnCopyEn = document.getElementById('btn-copy-en');
+// § RESULT EXPAND: per-field expand/collapse controls for the refined outputs.
+const btnExpandBn = document.getElementById('btn-expand-bn');
+const btnExpandEn = document.getElementById('btn-expand-en');
+const expandBnSvg = document.getElementById('expand-bn-svg');
+const expandEnSvg = document.getElementById('expand-en-svg');
 const btnCopyBoth = document.getElementById('btn-copy-both');
 const btnRecordAgain = document.getElementById('btn-record-again');
 
@@ -886,6 +891,78 @@ function toggleTranscriptExpand() {
 if (btnExpandTranscript) {
   btnExpandTranscript.addEventListener('click', toggleTranscriptExpand);
 }
+
+// § RESULT EXPAND: independent expand/collapse for the Bangla and English output
+// textareas — vertical height only, each field has its own state. Reuses the
+// input field's expand icon language and popup sizing behavior. Visual read aid
+// only; no data or Refine/Bilingual flow changes.
+const RESULT_EXPAND_ICON = '<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/>';
+const RESULT_COLLAPSE_ICON = '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>';
+let isBanglaExpanded = false;
+let isEnglishExpanded = false;
+
+function applyResultExpandState() {
+  if (outputBn) outputBn.classList.toggle('is-expanded', isBanglaExpanded);
+  if (outputEn) outputEn.classList.toggle('is-expanded', isEnglishExpanded);
+  if (expandBnSvg) {
+    expandBnSvg.innerHTML = isBanglaExpanded ? RESULT_COLLAPSE_ICON : RESULT_EXPAND_ICON;
+  }
+  if (expandEnSvg) {
+    expandEnSvg.innerHTML = isEnglishExpanded ? RESULT_COLLAPSE_ICON : RESULT_EXPAND_ICON;
+  }
+  if (btnExpandBn) {
+    btnExpandBn.title = isBanglaExpanded ? 'Collapse Bangla text' : 'Expand Bangla text';
+    btnExpandBn.setAttribute('aria-label', btnExpandBn.title);
+  }
+  if (btnExpandEn) {
+    btnExpandEn.title = isEnglishExpanded ? 'Collapse English text' : 'Expand English text';
+    btnExpandEn.setAttribute('aria-label', btnExpandEn.title);
+  }
+  // Popup sizing follows the new content height (same pattern as the transcript
+  // collapse/expand: detached → chrome.windows.update, attached → measured pin).
+  if (typeof isDetached !== 'undefined' && isDetached) {
+    const needed = document.body.scrollHeight + (window.outerHeight - window.innerHeight || 0);
+    if (typeof chrome !== 'undefined' && chrome.windows && chrome.windows.getCurrent) {
+      chrome.windows.getCurrent((win) => {
+        if (chrome.runtime.lastError || !win) {
+          if (typeof window.resizeTo === 'function') {
+            window.resizeTo(
+              Math.min(Math.max(290, window.outerWidth), MAX_POPUP_WIDTH),
+              Math.min(needed, MAX_POPUP_HEIGHT)
+            );
+          }
+          return;
+        }
+        try {
+          chrome.windows.update(win.id, {
+            width: Math.min(Math.max(290, win.width || MAX_POPUP_WIDTH), MAX_POPUP_WIDTH),
+            height: Math.min(needed, MAX_POPUP_HEIGHT)
+          });
+        } catch (e) { /* ignore */ }
+      });
+    } else if (typeof window.resizeTo === 'function') {
+      window.resizeTo(
+        Math.min(Math.max(290, window.outerWidth), MAX_POPUP_WIDTH),
+        Math.min(needed, MAX_POPUP_HEIGHT)
+      );
+    }
+  } else if (typeof pinAttachedBubbleHeight === 'function') {
+    pinAttachedBubbleHeight();
+  }
+}
+
+function toggleBanglaExpand() {
+  isBanglaExpanded = !isBanglaExpanded;
+  applyResultExpandState();
+}
+
+function toggleEnglishExpand() {
+  isEnglishExpanded = !isEnglishExpanded;
+  applyResultExpandState();
+}
+
+if (btnExpandBn) btnExpandBn.addEventListener('click', toggleBanglaExpand);
+if (btnExpandEn) btnExpandEn.addEventListener('click', toggleEnglishExpand);
 
 // Detached movable popup support with permanent memory
 const urlParams = new URLSearchParams(window.location.search);

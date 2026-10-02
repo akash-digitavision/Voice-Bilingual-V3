@@ -1545,6 +1545,25 @@ async function scenarioCompactPopupUi() {
       popupHtml.includes('<span>Stop</span>') && popupHtml.includes('<span>Close</span>') &&
       !popupHtml.includes('✨') && !popupHtml.includes('■ Stop') && !popupHtml.includes('✕ Cancel'));
 
+  // § RESULT EXPAND: independent expand/collapse for Bangla + English outputs.
+  check('expand buttons exist on both result cards (reusing the input-field key style)',
+    popupHtml.includes('id="btn-expand-bn"') && popupHtml.includes('id="btn-expand-en"') &&
+      (popupHtml.match(/class="mini-action-btn expand-btn"/g) || []).length >= 2);
+  check('expand wiring + independent state in popup.js',
+    popupJs.includes('let isBanglaExpanded') && popupJs.includes('let isEnglishExpanded') &&
+      popupJs.includes("btnExpandBn.addEventListener('click', toggleBanglaExpand)") &&
+      popupJs.includes("btnExpandEn.addEventListener('click', toggleEnglishExpand)"));
+  check('expanded textarea state is vertical-only and reversible',
+    /\.result-textarea\.is-expanded\s*\{[^}]*min-height:\s*130px/.test(popupCss) &&
+      /\.result-textarea\.is-expanded\s*\{[^}]*max-height:\s*190px/.test(popupCss) &&
+      !/\.result-textarea\.is-expanded\s*\{[^}]*width/.test(popupCss));
+  check('expand toggles reuse the input-field icon language',
+    popupJs.includes("expandBnSvg.innerHTML = isBanglaExpanded ? RESULT_COLLAPSE_ICON : RESULT_EXPAND_ICON") &&
+      popupJs.includes("expandEnSvg.innerHTML = isEnglishExpanded ? RESULT_COLLAPSE_ICON : RESULT_EXPAND_ICON"));
+  check('copy handlers on the result cards untouched',
+    popupJs.includes("btnCopyBn.addEventListener('click', () => handleCopy(btnCopyBn, outputBn))") &&
+      popupJs.includes("btnCopyEn.addEventListener('click', () => handleCopy(btnCopyEn, outputEn))"));
+
   // § FOUR-BUTTON FIX: Copy / Refine / Stop / Cancel are locked to identical size.
   check('four lower buttons locked to exactly the same size (height 31px)',
     /\.voice-controls-grid \.btn\s*\{[^}]*height:\s*31px/.test(popupCss) &&
@@ -1553,23 +1572,25 @@ async function scenarioCompactPopupUi() {
     popupHtml.includes('id="btn-copy-original"') && popupHtml.includes('id="btn-refine"') &&
       popupHtml.includes('id="btn-stop"') && popupHtml.includes('id="btn-cancel"'));
 
-  // 9. Fixed maximum popup layout (320 × 430) from the ACTUAL complete render —
-  //    no clipped action buttons or footer. Smaller allowed, never larger.
-  check('CSS declares the fixed maximum popup size (320 × 430)',
+  // 9. Popup MAXIMUM height is exactly 380px — smaller allowed, never taller.
+  check('CSS caps the popup at the 380px maximum height (320 wide)',
     /body\s*\{[^}]*max-width:\s*320px/.test(popupCss) &&
-      /body\s*\{[^}]*max-height:\s*430px/.test(popupCss));
+      /body\s*\{[^}]*max-height:\s*380px/.test(popupCss));
   check('content body scrolls internally instead of clipping',
     /content-body\s*\{[^}]*overflow-y:\s*auto/.test(popupCss) &&
       /content-body\s*\{[^}]*min-height:\s*0/.test(popupCss));
   check('detached window resize targets are clamped to the maximum',
-    popupJs.includes('MAX_POPUP_WIDTH') && popupJs.includes('MAX_POPUP_HEIGHT') &&
+    popupJs.includes('MAX_POPUP_WIDTH') && popupJs.includes('MAX_POPUP_HEIGHT = 380') &&
       popupJs.includes('Math.min(targetHeight, MAX_POPUP_HEIGHT)'));
   check('detached window enforces the maximum on user resize',
     popupJs.includes('enforceMaxWindowSize') &&
       popupJs.includes("window.addEventListener('resize', enforceMaxWindowSize)"));
-  check('background clamps detached window creation to the maximum',
+  check('background clamps detached window creation to 380px',
     backgroundJs.includes('Math.min(Math.max(290, pos.width || 320), 320)') &&
-      backgroundJs.includes('Math.min(Math.max(200, pos.height || 430), 430)'));
+      backgroundJs.includes('Math.min(Math.max(200, pos.height || 380), 380)'));
+  check('no stale height constant remains',
+    !popupJs.includes('MAX_POPUP_HEIGHT = 430') && !popupJs.includes('MAX_POPUP_HEIGHT = 420') &&
+      !popupJs.includes('MAX_POPUP_HEIGHT = 375') && !popupJs.includes('MAX_POPUP_HEIGHT = 378'));
 
   // § COLLAPSE/EXPAND HEIGHT AUTO-ADJUST: the popup must actively resize on
   // collapse/expand (browsers never shrink it themselves — blank-area bug).
