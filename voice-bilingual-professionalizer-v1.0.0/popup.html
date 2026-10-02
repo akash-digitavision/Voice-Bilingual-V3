@@ -68,9 +68,10 @@
               </button>
             </div>
           </div>
-          <div id="transcript-preview" class="transcript-preview empty">
-            <span class="preview-placeholder"></span>
-          </div>
+          <!-- § EDITABLE INPUT: the recognized transcript is now a manually editable
+               field (same .transcript-preview styling/geometry). Edits sync into the
+               app state, so Copy/Refine always use the CURRENT field content. -->
+          <textarea id="transcript-preview" class="transcript-preview empty" spellcheck="false" aria-label="Voice input transcript (editable)"></textarea>
         </div>
 
         <!-- § CLEANUP: the Bangla/English/Timer row was removed per instruction —

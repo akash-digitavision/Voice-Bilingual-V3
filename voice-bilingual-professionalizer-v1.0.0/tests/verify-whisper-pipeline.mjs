@@ -719,6 +719,11 @@ class MockSpeechRecognition {
       setTimeout(() => this.onerror && this.onerror({ error: 'not-allowed' }), 5);
       return;
     }
+    if (b === 'error-aborted-starting') {
+      // Genuine start interruption: 'aborted' arrives BEFORE onstart (state STARTING).
+      setTimeout(() => this.onerror && this.onerror({ error: 'aborted' }), 5);
+      return;
+    }
     if (b === 'immediate-end') {
       // THE SHIFT SYMPTOM: onstart fires, then the session immediately ends.
       setTimeout(() => this.onstart && this.onstart(), 5);
@@ -733,8 +738,12 @@ class MockSpeechRecognition {
     setTimeout(() => this.onstart && this.onstart(), 5);
   }
   stop() { setTimeout(() => this.onend && this.onend(), 5); }
-  abort() { setTimeout(() => this.onend && this.onend(), 5); }
+  abort() {
+    MockSpeechRecognition.abortCalls++;
+    setTimeout(() => this.onend && this.onend(), 5);
+  }
 }
+MockSpeechRecognition.abortCalls = 0;
 
 async function scenarioWebSpeechLifecycle() {
   section('SCENARIO 12 — Web Speech lifecycle: ONE attempt per user action, manual retry only');
@@ -855,6 +864,57 @@ async function scenarioWebSpeechLifecycle() {
   check('instant no-speech surfaces immediately (one attempt, no retry)',
     MockSpeechRecognition.startCalls === 1 && errors5.length === 1 && errors5[0].code === 'no-speech',
     { startCalls: MockSpeechRecognition.startCalls, errors: errors5 });
+
+  // (j) § LIFECYCLE FIX — the post-Refine sequence: session ENDED (settled), then
+  //     a new start. The settled instance must NOT be abort()ed again, and the
+  //     fresh session must start cleanly on the FIRST attempt.
+  MockSpeechRecognition.instances = [];
+  MockSpeechRecognition.startCalls = 0;
+  MockSpeechRecognition.abortCalls = 0;
+  MockSpeechRecognition.behavior = 'ok';
+  const svc6 = new SpeechService({ language: 'en-US' });
+  const errors6 = [];
+  svc6.onError = (e) => errors6.push(e);
+  svc6.onEnd = () => {};
+  svc6.start();
+  await sleep(120);            // session LISTENING
+  svc6.stop();
+  await sleep(60);             // ENDED — settled (user reads/edits text, refines...)
+  check('post-recording: session settled (ENDED)', svc6.state === 'ENDED', svc6.state);
+  svc6.start();                // next mic press AFTER Refine
+  await sleep(120);
+  check('post-Refine start works on the FIRST attempt (settled instance not re-aborted)',
+    MockSpeechRecognition.startCalls === 2 && MockSpeechRecognition.abortCalls === 0 &&
+      svc6.state === 'LISTENING' && errors6.length === 0,
+    { startCalls: MockSpeechRecognition.startCalls, abortCalls: MockSpeechRecognition.abortCalls,
+      state: svc6.state, errors: errors6 });
+
+  // (k) Stale teardown events from the replaced/dead instance never surface.
+  const deadInstance = MockSpeechRecognition.instances[0];
+  const errCountBefore = errors6.length;
+  if (deadInstance.onerror) deadInstance.onerror({ error: 'aborted' }); // stale 'aborted'
+  if (deadInstance.onend) deadInstance.onend();                          // stale onend
+  await sleep(30);
+  check('stale teardown events from a replaced instance are ignored',
+    errors6.length === errCountBefore && svc6.state === 'LISTENING',
+    { errors: errors6, state: svc6.state });
+
+  // (l) A genuine 'aborted' while STARTING still surfaces (diagnostics preserved,
+  //     manual retry intact — one attempt only).
+  MockSpeechRecognition.instances = [];
+  MockSpeechRecognition.startCalls = 0;
+  MockSpeechRecognition.behavior = 'error-aborted-starting';
+  const svc7 = new SpeechService({ language: 'en-US' });
+  const errors7 = [];
+  svc7.onError = (e) => errors7.push(e);
+  svc7.onEnd = () => {};
+  svc7.start();
+  await sleep(120);
+  check('genuine aborted-during-start still surfaces immediately (no auto retry)',
+    errors7.length === 1 && errors7[0].code === 'aborted' &&
+      errors7[0].message === 'Recognition was interrupted while starting.' &&
+      MockSpeechRecognition.startCalls === 1,
+    { errors: errors7, startCalls: MockSpeechRecognition.startCalls });
 }
 
 // ------------------------------------------------------------------ scenario 13
@@ -1572,6 +1632,22 @@ async function scenarioCompactPopupUi() {
   check('Expand icon scale matches the Copy emoji (20px) in result headers',
     /\.result-card \.card-header \.mini-action-btn\.expand-btn svg\s*\{[^}]*width:\s*20px/.test(popupCss) &&
       /\.result-card \.card-header \.mini-action-btn\.expand-btn svg\s*\{[^}]*height:\s*20px/.test(popupCss));
+
+  // § EDITABLE INPUT: the Voice Input Text Field is a manually editable textarea.
+  check('transcript field is a textarea with the same class (identical appearance)',
+    /<textarea id="transcript-preview" class="transcript-preview empty"/.test(popupHtml) &&
+      !popupHtml.includes('preview-placeholder'));
+  check('textarea keeps the recessed design, adds only editability',
+    /textarea#transcript-preview\s*\{[^}]*resize:\s*none/.test(popupCss) &&
+      /textarea#transcript-preview\s*\{[^}]*font-family:\s*inherit/.test(popupCss) &&
+      /\.transcript-preview\s*\{[^}]*box-shadow:\s*var\(--shadow-inset-field\)/.test(popupCss));
+  check('user edits sync into currentTranscript (Refine reads the field)',
+    popupJs.includes("transcriptPreview.addEventListener('input'") &&
+      popupJs.includes('currentTranscript = transcriptPreview.value;') &&
+      popupJs.includes('const normalized = normalizeTranscript(currentTranscript);'));
+  check('recognition renders into the editable field via .value',
+    (popupJs.match(/transcriptPreview\.value =/g) || []).length >= 10 &&
+      !popupJs.includes('transcriptPreview.textContent'));
 
   // § FOUR-BUTTON FIX: Copy / Refine / Stop / Cancel are locked to identical size.
   check('four lower buttons locked to exactly the same size (height 31px)',

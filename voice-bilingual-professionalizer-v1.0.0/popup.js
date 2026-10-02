@@ -115,6 +115,24 @@ let timerInterval = null;
 let recordingStartTime = null;
 let currentTranscript = '';
 let settings = null;
+
+// § EDITABLE INPUT: the Voice Input Text Field is manually editable. Every user
+// edit is synchronized into `currentTranscript`, so Copy and Refine always use
+// the CURRENT field content — the edited text is the authoritative input.
+if (transcriptPreview) {
+  transcriptPreview.addEventListener('input', () => {
+    currentTranscript = transcriptPreview.value;
+    transcriptPreview.classList.toggle('empty', !currentTranscript.trim());
+    // Button availability follows the edited content when no recognition
+    // session is active (recording/generating manage their own states).
+    if (currentState !== 'RECORDING' && currentState !== 'GENERATING') {
+      const hasText = !!currentTranscript.trim();
+      if (btnRefine) btnRefine.disabled = !hasText;
+      if (btnCopyOriginal) btnCopyOriginal.disabled = !hasText;
+      if (btnCopyHeader) btnCopyHeader.disabled = !hasText;
+    }
+  });
+}
 const sttPrivacyBadge = document.getElementById('stt-privacy-badge');
 const voiceStackBadge = document.getElementById('voice-stack-badge');
 const voiceStackName = document.getElementById('voice-stack-name');
@@ -227,7 +245,7 @@ function initSpeech() {
       currentTranscript = result.full;
       if (currentTranscript.trim()) {
         transcriptPreview.classList.remove('empty');
-        transcriptPreview.textContent = currentTranscript;
+        transcriptPreview.value = currentTranscript;
         btnCopyOriginal.disabled = false;
         btnCopyHeader.disabled = false;
         btnRefine.disabled = false;
@@ -319,7 +337,7 @@ function applyLocalSttStage(st) {
       st.stage === STT_STAGE.INITIALIZING_BACKEND ||
       st.stage === STT_STAGE.INITIALIZING_MODEL)) {
     transcriptPreview.classList.remove('empty');
-    transcriptPreview.textContent = st.message || 'Initializing on-device Whisper...';
+    transcriptPreview.value = st.message || 'Initializing on-device Whisper...';
   }
 }
 
@@ -390,7 +408,7 @@ async function startRecording() {
       btnCopyHeader.disabled = true;
       currentTranscript = '';
       transcriptPreview.classList.add('empty');
-      transcriptPreview.textContent =
+      transcriptPreview.value =
         `Recording — Voice API (${providerName(vi.provider)}, batch). Press Stop to transcribe.`;
       startTimer();
       return;
@@ -430,7 +448,7 @@ async function startRecording() {
       btnCopyHeader.disabled = true;
       currentTranscript = '';
       transcriptPreview.classList.add('empty');
-      transcriptPreview.textContent = 'Listening on-device... Speak naturally. (Recording continues even if this window closes.)';
+      transcriptPreview.value = 'Listening on-device... Speak naturally. (Recording continues even if this window closes.)';
       startTimer();
       return;
     } catch (err) {
@@ -446,7 +464,7 @@ async function startRecording() {
   initSpeech();
   currentTranscript = '';
   transcriptPreview.classList.add('empty');
-  transcriptPreview.textContent = '';
+  transcriptPreview.value = '';
   btnCopyOriginal.disabled = true;
   btnCopyHeader.disabled = true;
   btnRefine.disabled = true;
@@ -463,7 +481,7 @@ async function stopRecording() {
 
   if (settings?.speechEngine === 'voiceapi') {
     transcriptPreview.classList.remove('empty');
-    transcriptPreview.textContent = 'Transcribing with Voice API (batch)...';
+    transcriptPreview.value = 'Transcribing with Voice API (batch)...';
     try {
       const resp = await whisperCommand({ action: 'RECORD_STOP' });
       if (!resp.ok) throw new Error(resp.message || 'Voice API transcription failed.');
@@ -479,14 +497,14 @@ async function stopRecording() {
       if (voiceStackName) voiceStackName.textContent = `Voice API (${result.provider || 'unknown'})`;
       const dur = result.inferenceDurationMs ? `${(result.inferenceDurationMs / 1000).toFixed(1)}s transcription` : '';
       if (currentTranscript.trim()) {
-        transcriptPreview.textContent = currentTranscript;
+        transcriptPreview.value = currentTranscript;
         if (statusLabel) statusLabel.textContent = `Listening was — Voice API · ${dur}`;
         btnCopyOriginal.disabled = false;
         btnCopyHeader.disabled = false;
         btnRefine.disabled = false;
       } else {
         transcriptPreview.classList.add('empty');
-        transcriptPreview.textContent = 'Voice API returned an empty transcript.';
+        transcriptPreview.value = 'Voice API returned an empty transcript.';
       }
     } catch (e) {
       console.error('[Voice API] transcription failed:', e);
@@ -497,7 +515,7 @@ async function stopRecording() {
 
   if (isUsingLocalSTT) {
     transcriptPreview.classList.remove('empty');
-    transcriptPreview.textContent = 'Transcribing on-device with Whisper...';
+    transcriptPreview.value = 'Transcribing on-device with Whisper...';
     try {
       const selectedLang = selectedPopupLanguage() === 'en-US' ? 'en' : 'bn';
       const resp = await whisperCommand({ action: 'RECORD_STOP', language: selectedLang });
@@ -527,7 +545,7 @@ async function stopRecording() {
         (metricBits.length ? ` · ${metricBits.join(' · ')}` : '');
 
       if (currentTranscript.trim()) {
-        transcriptPreview.textContent = currentTranscript;
+        transcriptPreview.value = currentTranscript;
         if (statusLabel) statusLabel.textContent = statsLine.trim();
         btnCopyOriginal.disabled = false;
         btnCopyHeader.disabled = false;
@@ -537,7 +555,7 @@ async function stopRecording() {
         const why = resp.result && resp.result.reason === 'NO_AUDIO_CAPTURED'
           ? 'No audio reached the recorder (0 seconds captured). Check that the correct microphone is selected and not muted.'
           : 'No voice input detected. Please speak clearly into your microphone.';
-        transcriptPreview.textContent = why + (statsLine ? ` (${statsLine.trim()})` : '');
+        transcriptPreview.value = why + (statsLine ? ` (${statsLine.trim()})` : '');
       }
     } catch (e) {
       // Report the stage that genuinely failed. A 100% download is not a failure,
@@ -614,7 +632,7 @@ function cancelRecording() {
   if (statusLabel) statusLabel.textContent = '';
   if (recordingTimer) recordingTimer.textContent = '00:00';
   transcriptPreview.classList.add('empty');
-  transcriptPreview.textContent = '';
+  transcriptPreview.value = '';
 }
 
 async function processTranscript() {
@@ -1033,7 +1051,7 @@ if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage)
       // Live typing: incremental Whisper chunks reconcile into FINAL text and the
       // stable tail streams into the field, mirroring Web Speech interim results.
       transcriptPreview.classList.remove('empty');
-      transcriptPreview.textContent = msg.text;
+      transcriptPreview.value = msg.text;
     }
     if (msg.type === 'WHISPER_LEVEL' && currentState === 'RECORDING') {
       // §9: the user must see that the microphone is working even before text
@@ -1054,7 +1072,7 @@ if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage)
       if (msg.ok && msg.result && msg.result.transcript && currentState !== 'RECORDING') {
         currentTranscript = msg.result.transcript;
         transcriptPreview.classList.remove('empty');
-        transcriptPreview.textContent = currentTranscript;
+        transcriptPreview.value = currentTranscript;
         btnCopyOriginal.disabled = false;
         btnCopyHeader.disabled = false;
         btnRefine.disabled = false;
@@ -1114,7 +1132,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         btnStop.disabled = false;
         btnStop.classList.add('recording');
         transcriptPreview.classList.remove('empty');
-        transcriptPreview.textContent = 'Recording continues in the background — press stop to transcribe.';
+        transcriptPreview.value = 'Recording continues in the background — press stop to transcribe.';
         return true;
       }
       return false;

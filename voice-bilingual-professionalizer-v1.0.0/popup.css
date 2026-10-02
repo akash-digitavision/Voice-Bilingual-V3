@@ -535,6 +535,25 @@ body.detached-mode {
   color: #94a3b8;
 }
 
+/* § EDITABLE INPUT: the transcript field is a textarea now — same styling,
+   same geometry, same recessed design; only editability is added. */
+textarea#transcript-preview {
+  display: block;
+  resize: none;
+  font-family: inherit;
+  cursor: text;
+}
+
+textarea#transcript-preview:focus {
+  outline: none;
+  box-shadow: var(--shadow-inset-field-focus);
+}
+
+textarea#transcript-preview::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
 .preview-placeholder {
   pointer-events: none;
 }
